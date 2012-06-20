@@ -1,0 +1,31 @@
+<!-- BEGIN_INCLUDE(indivo:account-create) -->
+    <indivo:account-create primarySecret="false" secondarySecret="false" contactEmail="muley@mulesoft.com" accountId="muley@mulesoft.com" fullName="Muley The Mule"/>
+<!-- END_INCLUDE(indivo:account-create) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-search) -->
+    <indivo:account-search fullName="Muley The Mule"/>
+<!-- END_INCLUDE(indivo:account-search) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-info) -->
+    <indivo:account-info accountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:account-info) -->
+
+<!-- BEGIN_INCLUDE(indivo:get-connect-credentials) -->
+    <indivo:get-connect-credentials accountId="muley@mulesoft.com" phaId="ibm@tibco.com" recordId="myRecordId"/>
+<!-- END_INCLUDE(indivo:get-connect-credentials) -->
+
+<!-- BEGIN_INCLUDE(indivo:delete-user-preferences) -->
+    <indivo:delete-user-preferences accountId="muley@mulesoft.com" phaId="ibm@tibco.com"/>
+<!-- END_INCLUDE(indivo:delete-user-preferences) -->
+
+<!-- BEGIN_INCLUDE(indivo:get-user-preferences) -->
+    <indivo:get-user-preferences accountId="muley@mulesoft.com" phaId="ibm@tibco.com"/>
+<!-- END_INCLUDE(indivo:get-user-preferences) -->
+
+<!-- BEGIN_INCLUDE(indivo:set-user-preferences) -->
+    <indivo:set-user-preferences accountId="muley@mulesoft.com" phaId="ibm@tibco.com"/>
+<!-- END_INCLUDE(indivo:set-user-preferences) -->
+
+<!-- BEGIN_INCLUDE(indivo:smart-generic) -->
+    <indivo:smart-generic recordId="1234567890" modelName="problems"/>
+<!-- END_INCLUDE(indivo:smart-generic) -->
