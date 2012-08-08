@@ -26,6 +26,290 @@
     <indivo:set-user-preferences accountId="muley@mulesoft.com" phaId="ibm@tibco.com"/>
 <!-- END_INCLUDE(indivo:set-user-preferences) -->
 
+<!-- BEGIN_INCLUDE(indivo:account-authsystem-add) -->
+    <indivo:account-authsystem-add accountId="muley@mulesoft.com" userName="muley" password="foobar" system="password"/>
+<!-- END_INCLUDE(indivo:account-authsystem-add) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-password-change) -->
+    <indivo:account-password-change accountId="muley@mulesoft.com" userName="muley" oldPassword="foo" newPassword="bar"/>
+<!-- END_INCLUDE(indivo:account-password-change) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-password-set) -->
+    <indivo:account-password-set accountId="muley@mulesoft.com" userName="muley" password="foo"/>
+<!-- END_INCLUDE(indivo:account-password-set) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-username-set) -->
+    <indivo:account-username-set accountId="muley@mulesoft.com" userName="muley"/>
+<!-- END_INCLUDE(indivo:account-username-set) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-check-secrets) -->
+    <indivo:account-check-secrets accountId="muley@mulesoft.com" primarySecret="123" secondarySecret="xyz"/>
+<!-- END_INCLUDE(indivo:account-check-secrets) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-forgot-password) -->
+    <indivo:account-forgot-password accountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:account-forgot-password) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-inbox) -->
+    <indivo:account-inbox accountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:account-inbox) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-send-message) -->
+    <indivo:account-send-message accountId="muley@mulesoft.com" body="hello" severity="low" bodyType="plaintext" messageId="12345" subject="Test"/>
+<!-- END_INCLUDE(indivo:account-send-message) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-inbox-message) -->
+    <indivo:account-inbox-message accountId="muley@mulesoft.com" messageId="12345"/>
+<!-- END_INCLUDE(indivo:account-inbox-message) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-message-archive) -->
+    <indivo:account-message-archive accountId="muley@mulesoft.com" messageId="12345"/>
+<!-- END_INCLUDE(indivo:account-message-archive) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-inbox-message-attachment-accept) -->
+    <indivo:account-inbox-message-attachment-accept accountId="muley@mulesoft.com" messageId="12345" attachmentNumber="1"/>
+<!-- END_INCLUDE(indivo:account-inbox-message-attachment-accept) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-info-set) -->
+    <indivo:account-info-set accountId="muley@mulesoft.com" contactEmail="muley@mulesoft.com" fullName="Muley the Mule"/>
+<!-- END_INCLUDE(indivo:account-info-set) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-initialize) -->
+    <indivo:account-initialize accountId="muley@mulesoft.com" primarySecret="123" secondarySecret="xyz"/>
+<!-- END_INCLUDE(indivo:account-initialize) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-notifications) -->
+    <indivo:account-notifications accountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:account-notifications) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-permissions) -->
+    <indivo:account-permissions accountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:account-permissions) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-primary-secret) -->
+    <indivo:account-primary-secret accountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:account-primary-secret) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-record-list) -->
+    <indivo:account-record-list accountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:account-record-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-reset) -->
+    <indivo:account-reset accountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:account-reset) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-secret) -->
+    <indivo:account-secret accountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:account-secret) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-resend-secret) -->
+    <indivo:account-resend-secret accountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:account-resend-secret) -->
+
+<!-- BEGIN_INCLUDE(indivo:account-set-state) -->
+    <indivo:account-set-state accountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:account-set-state) -->
+
+<!-- BEGIN_INCLUDE(indivo:all-phas) -->
+    <indivo:all-phas/>
+<!-- END_INCLUDE(indivo:all-phas) -->
+
+<!-- BEGIN_INCLUDE(indivo:all-manifests) -->
+    <indivo:all-manifests/>
+<!-- END_INCLUDE(indivo:all-manifests) -->
+
+<!-- BEGIN_INCLUDE(indivo:pha) -->
+    <indivo:pha phaEmail="myApp@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:pha) -->
+
+<!-- BEGIN_INCLUDE(indivo:app-document-list) -->
+    <indivo:app-document-list phaEmail="myApp@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:app-document-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:app-document-create) -->
+    <indivo:app-document-create phaEmail="myApp@mulesoft.com" document="#[payload:]"/>
+<!-- END_INCLUDE(indivo:app-document-create) -->
+
+<!-- BEGIN_INCLUDE(indivo:app-document-create-or-update-ext) -->
+    <indivo:app-document-create-or-update-ext externalId="14c81023-c84f-496d-8b8e-9438280441d3" phaEmail="myApp@mulesoft.com" document="#[payload:]"/>
+<!-- END_INCLUDE(indivo:app-document-create-or-update-ext) -->
+
+<!-- BEGIN_INCLUDE(indivo:app-document-meta-ext) -->
+    <indivo:app-document-meta-ext phaEmail="myApp@mulesoft.com" externalId="14c81023-c84f-496d-8b8e-9438280441d3"/>
+<!-- END_INCLUDE(indivo:app-document-meta-ext) -->
+
+<!-- BEGIN_INCLUDE(indivo:app-document-delete) -->
+    <indivo:app-document-delete phaEmail="myApp@mulesoft.com" documentId="14c81023-c84f-496d-8b8e-9438280441d3"/>
+<!-- END_INCLUDE(indivo:app-document-delete) -->
+
+<!-- BEGIN_INCLUDE(indivo:app-specific-document) -->
+    <indivo:app-specific-document phaEmail="myApp@mulesoft.com" documentId="14c81023-c84f-496d-8b8e-9438280441d3"/>
+<!-- END_INCLUDE(indivo:app-specific-document) -->
+
+<!-- BEGIN_INCLUDE(indivo:app-document-create-or-update) -->
+    <indivo:app-document-create-or-update documentId="14c81023-c84f-496d-8b8e-9438280441d3" phaEmail="myApp@mulesoft.com" document="#[payload:]"/>
+<!-- END_INCLUDE(indivo:app-document-create-or-update) -->
+
+<!-- BEGIN_INCLUDE(indivo:app-document-label) -->
+    <indivo:app-document-label documentId="14c81023-c84f-496d-8b8e-9438280441d3" phaEmail="myApp@mulesoft.com" label="RELABELED: New HBA1C reading"/>
+<!-- END_INCLUDE(indivo:app-document-label) -->
+
+<!-- BEGIN_INCLUDE(indivo:app-document-meta) -->
+    <indivo:app-document-meta phaEmail="myApp@mulesoft.com" documentId="14c81023-c84f-496d-8b8e-9438280441d3"/>
+<!-- END_INCLUDE(indivo:app-document-meta) -->
+
+<!-- BEGIN_INCLUDE(indivo:app-manifest) -->
+    <indivo:app-manifest phaEmail="myApp@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:app-manifest) -->
+
+<!-- BEGIN_INCLUDE(indivo:app-record-list) -->
+    <indivo:app-record-list phaEmail="myApp@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:app-record-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:autonomous-access-token) -->
+    <indivo:autonomous-access-token phaEmail="myApp@mulesoft.com" recordId="123"/>
+<!-- END_INCLUDE(indivo:autonomous-access-token) -->
+
+<!-- BEGIN_INCLUDE(indivo:smart-capabilities) -->
+    <indivo:smart-capabilities/>
+<!-- END_INCLUDE(indivo:smart-capabilities) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-account-list) -->
+    <indivo:carenet-account-list carenetId="123"/>
+<!-- END_INCLUDE(indivo:carenet-account-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-account-create) -->
+    <indivo:carenet-account-create carenetId="123" write="true" accountId="myApp@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:carenet-account-create) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-account-delete) -->
+    <indivo:carenet-account-delete carenetId="123" accountId="myApp@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:carenet-account-delete) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-account-permissions) -->
+    <indivo:carenet-account-permissions carenetId="123" accountId="myApp@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:carenet-account-permissions) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-apps-list) -->
+    <indivo:carenet-apps-list carenetId="123"/>
+<!-- END_INCLUDE(indivo:carenet-apps-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-apps-delete) -->
+    <indivo:carenet-apps-delete carenetId="123" phaEmail="myApp@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:carenet-apps-delete) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-apps-create) -->
+    <indivo:carenet-apps-create carenetId="123" phaEmail="myApp@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:carenet-apps-create) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-read-demographics) -->
+    <indivo:carenet-read-demographics carenetId="123" responseFormat="application/json"/>
+<!-- END_INCLUDE(indivo:carenet-read-demographics) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-document-list) -->
+    <indivo:carenet-document-list carenetId="123" type=""/>
+<!-- END_INCLUDE(indivo:carenet-document-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-document) -->
+    <indivo:carenet-document carenetId="123" documentId="14c81023-c84f-496d-8b8e-9438280441d3"/>
+<!-- END_INCLUDE(indivo:carenet-document) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-document-meta) -->
+    <indivo:carenet-document-meta carenetId="123" documentId="14c81023-c84f-496d-8b8e-9438280441d3"/>
+<!-- END_INCLUDE(indivo:carenet-document-meta) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-record) -->
+    <indivo:carenet-record carenetId="123"/>
+<!-- END_INCLUDE(indivo:carenet-record) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-rename) -->
+    <indivo:carenet-rename carenetId="123" carenetName="xyz"/>
+<!-- END_INCLUDE(indivo:carenet-rename) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-equipment-list) -->
+    <indivo:carenet-equipment-list carenetId="123"/>
+<!-- END_INCLUDE(indivo:carenet-equipment-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-generic-list) -->
+    <indivo:carenet-generic-list carenetId="123" dataModel="TestMedication"/>
+<!-- END_INCLUDE(indivo:carenet-generic-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-measurement-list) -->
+    <indivo:carenet-measurement-list carenetId="123" labCode="98765"/>
+<!-- END_INCLUDE(indivo:carenet-measurement-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-procedure-list) -->
+    <indivo:carenet-procedure-list carenetId="123"/>
+<!-- END_INCLUDE(indivo:carenet-procedure-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-simple-clinical-notes-list) -->
+    <indivo:carenet-simple-clinical-notes-list carenetId="123"/>
+<!-- END_INCLUDE(indivo:carenet-simple-clinical-notes-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:coding-system-query) -->
+    <indivo:coding-system-query systemShortName="" query=""/>
+<!-- END_INCLUDE(indivo:coding-system-query) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-create) -->
+    <indivo:record-create document="#[payload]"/>
+<!-- END_INCLUDE(indivo:record-create) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-create-ext) -->
+    <indivo:record-create-ext document="#[payload]" principalEmail="muley@mulesoft.com" externalId="123"/>
+<!-- END_INCLUDE(indivo:record-create-ext) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-search) -->
+    <indivo:record-search label="Muley the Mule"/>
+<!-- END_INCLUDE(indivo:record-search) -->
+
+<!-- BEGIN_INCLUDE(indivo:record) -->
+    <indivo:record recordId="123"/>
+<!-- END_INCLUDE(indivo:record) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-phas) -->
+    <indivo:record-phas recordId="123"/>
+<!-- END_INCLUDE(indivo:record-phas) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-pha-delete) -->
+    <indivo:record-pha-delete recordId="123" phaId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:record-pha-delete) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-pha) -->
+    <indivo:record-pha recordId="123" phaId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:record-pha) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-pha-enable) -->
+    <indivo:record-pha-enable recordId="123" phaId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:record-pha-enable) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-app-document-list) -->
+    <indivo:record-app-document-list recordId="123" phaId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:record-app-document-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-app-document-create) -->
+    <indivo:record-app-document-create recordId="123" phaId="muley@mulesoft.com" document="#[payload]"/>
+<!-- END_INCLUDE(indivo:record-app-document-create) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-app-document-create-or-update-ext) -->
+    <indivo:record-app-document-create-or-update-ext recordId="123" externalId="xyz" phaId="muley@mulesoft.com" document="#[payload]"/>
+<!-- END_INCLUDE(indivo:record-app-document-create-or-update-ext) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-app-document-meta-ext) -->
+    <indivo:record-app-document-meta-ext recordId="123" externalId="xyz" phaId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:record-app-document-meta-ext) -->
+
+<!-- BEGIN_INCLUDE(indivo:smart-ontology) -->
+    <indivo:smart-ontology/>
+<!-- END_INCLUDE(indivo:smart-ontology) -->
+
+<!-- BEGIN_INCLUDE(indivo:smart-allergies) -->
+    <indivo:smart-allergies recordId="123"/>
+<!-- END_INCLUDE(indivo:smart-allergies) -->
+
+<!-- BEGIN_INCLUDE(indivo:smart-allergies-instance) -->
+    <indivo:smart-allergies-instance recordId="123" modelId="987"/>
+<!-- END_INCLUDE(indivo:smart-allergies-instance) -->
+
 <!-- BEGIN_INCLUDE(indivo:smart-generic) -->
     <indivo:smart-generic recordId="1234567890" modelName="problems"/>
 <!-- END_INCLUDE(indivo:smart-generic) -->

@@ -20,39 +20,41 @@
  */
 package com.mulesoft.module.indivo;
 
-import org.mule.api.annotations.*;
-import org.mule.api.annotations.oauth.*;
-import org.mule.api.annotations.param.*;
+import java.io.InputStream;
 
-import com.sun.jersey.api.client.*;
-import com.sun.jersey.api.client.config.*;
-import com.sun.jersey.api.client.filter.*;
-import com.sun.jersey.api.representation.Form;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.*;
-import com.sun.jersey.multipart.impl.*;
+import javax.ws.rs.core.MediaType;
+
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuthAccessToken;
+import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
+import org.mule.api.annotations.oauth.OAuthConsumerKey;
+import org.mule.api.annotations.oauth.OAuthConsumerSecret;
+import org.mule.api.annotations.param.Default;
+import org.mule.api.annotations.param.Optional;
+import org.mule.util.StringUtils;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.client.filter.LoggingFilter;
+import com.sun.jersey.multipart.impl.MultiPartWriter;
 import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.HMAC_SHA1;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
-import java.io.*;
-import java.util.*;
-
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.ConnectionException;
-import org.mule.util.StringUtils;
-
-import javax.ws.rs.core.MediaType;
 /**
  * Cloud Connector
  *
  * @author MuleSoft, Inc.
  */
-@Module(name="indivo", schemaVersion="3.3.0")
+@Connector(name="indivo", schemaVersion="3.3.0")
 @OAuth(requestTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/request_token",
        accessTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/access_token",
        authorizationUrl = "http://sandbox.indivohealth.org/oauth/authorize",
@@ -87,6 +89,7 @@ public class IndivoModule
     @OAuthConsumerSecret
     private String appSecret;
     
+    
     /**
     * debug mode
     */
@@ -95,27 +98,47 @@ public class IndivoModule
     @Default("false")
     private boolean debug;
 
+    @OAuthAccessToken 
+    private String accessToken;
+    
+    @OAuthAccessTokenSecret 
+    private String accessTokenSecret;
+
     private Client client;
+    
+    //======================== ACCOUNT ==============================================//-
     
     /**
      * Create a new account, and send out initialization emails
      *
      * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-create}
      *
-     * @param accessToken accessToken
-     * @param accessTokenSecret access token secret
      * @param primarySecret Does this account require a primary secret?
      * @param secondarySecret Does this account require a secondary secret?
 	 * @param contactEmail A valid email at which to reach the account holder. If empty, accountId will be used.
      * @param accountId An identifier for the new account. Must be a valid email address. REQUIRED
      * @param fullName The full name to associate with the account.
      * 
+     * @throws java.lang.Exception if not successful
+     * 
      * @return information about the new account on success
+     * Example Return Value:
+	 *	
+	 *	<Account id="joeuser@indivo.example.org">
+	 *	  <fullName>Joe User</fullName>
+	 *	  <contactEmail>joeuser@gmail.com</contactEmail>
+	 *	  <lastLoginAt>2010-05-04T15:34:23Z</lastLoginAt>
+	 *	  <totalLoginCount>43</totalLoginCount>
+	 *	  <failedLoginCount>0</failedLoginCount>
+	 *	  <state>active</state>
+	 *	  <lastStateChange>2009-04-03T13:12:12Z</lastStateChange>
+	 *	
+	 *	  <authSystem name="password" username="joeuser" />
+	 *	  <authSystem name="hospital_sso" username="Joe_User" />
+	 *	</Account>
      */
     @Processor
-    public String accountCreate(@OAuthAccessToken String accessToken,
-                                @OAuthAccessTokenSecret String accessTokenSecret,
-                                @Optional @Default("false") boolean primarySecret,
+    public String accountCreate(@Optional @Default("false") boolean primarySecret,
                                 @Optional @Default("false") boolean secondarySecret,
                                 @Optional String contactEmail,
                                 String accountId,
@@ -123,7 +146,7 @@ public class IndivoModule
     {        
         final String apiUrl = getApiUrl("accounts/");
 
-        WebResource r = getClient().resource(apiUrl);
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
         r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 
         /*
@@ -141,13 +164,7 @@ public class IndivoModule
         	 .queryParam("account_id", accountId)
         	 .queryParam("full_name", fullName);
 
-        if (isDebug())
-        {
-            r.addFilter(new LoggingFilter());
-        }
-        r.addFilter(getOAuthClientFilter(accessToken, accessTokenSecret));
-
-    	String response = r.post(String.class);
+        String response = r.post(String.class);
     	return response;
     }
 
@@ -157,23 +174,37 @@ public class IndivoModule
      *
      * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-search}
      *
-     * @param accessToken accessToken
-     * @param accessTokenSecret access token secret
+     * 
+     * 
      * @param contactEmail The full name of the account to search for
      * @param fullName The contact email of the account to search for
      * 
+     * @throws java.lang.Exception if not successful
+     * 
      * @return information about matching accounts
+     * Example Return Value:
+	 *	
+	 *	<Account id="joeuser@indivo.example.org">
+	 *	  <fullName>Joe User</fullName>
+	 *	  <contactEmail>joeuser@gmail.com</contactEmail>
+	 *	  <lastLoginAt>2010-05-04T15:34:23Z</lastLoginAt>
+	 *	  <totalLoginCount>43</totalLoginCount>
+	 *	  <failedLoginCount>0</failedLoginCount>
+	 *	  <state>active</state>
+	 *	  <lastStateChange>2009-04-03T13:12:12Z</lastStateChange>
+	 *	
+	 *	  <authSystem name="password" username="joeuser" />
+	 *	  <authSystem name="hospital_sso" username="Joe_User" />
+	 *	</Account>
      */
     @Processor
-    public InputStream accountSearch(@OAuthAccessToken String accessToken,
-                                     @OAuthAccessTokenSecret String accessTokenSecret,
-                                     @Optional @Default("") String contactEmail,
+    public InputStream accountSearch(@Optional @Default("") String contactEmail,
                                      @Optional @Default("") String fullName) throws Exception
     {
         final String apiUrl = getApiUrl("accounts/search");
 
-        WebResource r = getClient().resource(apiUrl);
-
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
         /*
           Query Parameters:
  	
@@ -183,13 +214,6 @@ public class IndivoModule
         r = r.queryParam("fullname", fullName)
              .queryParam("contact_email", contactEmail);
         
-        if (isDebug())
-        {
-            r.addFilter(new LoggingFilter());
-        }
-        
-        r.addFilter(getOAuthClientFilter(accessToken, accessTokenSecret));
-
         InputStream response = r.get(InputStream.class);
         
         return response;
@@ -200,28 +224,33 @@ public class IndivoModule
      *
      * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-info}
      *
-     * @param accessToken accessToken
-     * @param accessTokenSecret access token secret
      * @param accountId The email identifier of the Indivo account. REQUIRED     
-     *  
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
      * @return information about the account
+     * Example Return Value:
+     *  
+     *  <Account id="joeuser@indivo.example.org">
+     *    <fullName>Joe User</fullName>
+     *    <contactEmail>joeuser@gmail.com</contactEmail>
+     *    <lastLoginAt>2010-05-04T15:34:23Z</lastLoginAt>
+     *    <totalLoginCount>43</totalLoginCount>
+     *    <failedLoginCount>0</failedLoginCount>
+     *    <state>active</state>
+     *    <lastStateChange>2009-04-03T13:12:12Z</lastStateChange>
+     *  
+     *    <authSystem name="password" username="joeuser" />
+     *    <authSystem name="hospital_sso" username="Joe_User" />
+     *  </Account>
      */
     @Processor
-    public InputStream accountInfo(@OAuthAccessToken String accessToken,
-                                   @OAuthAccessTokenSecret String accessTokenSecret,
-                                   String accountId) throws Exception
+    public InputStream accountInfo(String accountId) throws Exception
     {
         final String apiUrl = getApiUrl("accounts/" + accountId);
 
-        WebResource r = getClient().resource(apiUrl);
-
-        if (isDebug())
-        {
-            r.addFilter(new LoggingFilter());
-        }
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
         
-        r.addFilter(getOAuthClientFilter(accessToken, accessTokenSecret));
-
         InputStream response = r.get(InputStream.class);
         
         return response;
@@ -232,25 +261,38 @@ public class IndivoModule
      *
      * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:get-connect-credentials}
      *
-     * @param accessToken accessToken
-     * @param accessTokenSecret access token secret
+     * 
+     * 
      * @param accountId  The email identifier of the Indivo account to authorize the connect credentials
      * @param phaId The email identifier of the Indivo user app to grant access via the connect credentials
      * @param recordId The identifier of the Indivo Record to which to grant access via the connect credentials
      * 
+     * @throws java.lang.Exception if not successful
+     * 
      * @return set of credentials providing access for the app to the record, via Connect-Style Authentication and via Standard oAuth authentication. 
      *         Additionally, the credentials include a precalculated oAuth Header that the app can use to access the record.
+     * Example Return Value:
+     * 
+     * <ConnectCredentials>
+     *   <App id="problems@apps.indivo.org" />
+     *   <ConnectToken>1QzyGdx13Da</ConnectToken>
+     *   <ConnectSecret>re3Qg4dxaf9</ConnectSecret>
+     *   <APIBase>http://your_indivo_instance.org:8000</APIBase>
+     *   <RESTToken>7qGer7dx4gC</RESTToken>
+     *   <RESTSecret>5JpXb0G2g4u</RESTSecret>
+     *   <OAuthHeader>OAuth realm="", oauth_version="1.0", oauth_consumer_key="problems%40apps.indivo.org", oauth_signature_method="HMAC-SHA1", oauth_nonce="VNGQuyvdHbGLsFXm2oIL", oauth_timestamp="1334848404", oauth_signature="HHpwLSSCxgRhYfWDw3uLdmjsyMk%3D"</OAuthHeader>
+     *   <ExpiresAt>2012-07-04T00:00:00Z</ExpiresAt>
+     * </ConnectCredentials>     
      */
     @Processor
-    public String getConnectCredentials(@OAuthAccessToken String accessToken,
-                                        @OAuthAccessTokenSecret String accessTokenSecret,
-                                        String accountId,
+    public String getConnectCredentials(String accountId,
     									String phaId,
     									String recordId) throws Exception
     {
         final String apiUrl = getApiUrl("accounts/" + accountId + "/apps/" + phaId + "/connect_credentials");
 
-        WebResource r = getClient().resource(apiUrl);
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
         r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 
         /*
@@ -259,12 +301,6 @@ public class IndivoModule
 			record_id – The identifier of the Indivo Record to which to grant access via the connect credentials
 		 */
         r = r.queryParam("record_id", recordId);
-
-        if (isDebug())
-        {
-            r.addFilter(new LoggingFilter());
-        }
-        r.addFilter(getOAuthClientFilter(accessToken, accessTokenSecret));
 
     	String response = r.post(String.class);
     	return response;
@@ -276,29 +312,23 @@ public class IndivoModule
      *
      * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:delete-user-preferences}
      *
-     * @param accessToken accessToken
-     * @param accessTokenSecret access token secret
+     * 
+     * 
      * @param accountId The email identifier of the Indivo account
      * @param phaId The email identifier of the Indivo user app
+     * 
+     * @throws java.lang.Exception if not successful
      * 
      * @return <ok/> if successful
      */
     @Processor
-    public String deleteUserPreferences(@OAuthAccessToken String accessToken,
- 				                        @OAuthAccessTokenSecret String accessTokenSecret,
-				                        String accountId,
+    public String deleteUserPreferences(String accountId,
 				                        String phaId) throws Exception
     {
     	final String apiUrl = getApiUrl("accounts/" + accountId + "/apps/" + phaId + "/preferences");
 
-        WebResource r = getClient().resource(apiUrl);
-
-        if (isDebug())
-        {
-            r.addFilter(new LoggingFilter());
-        }
-        r.addFilter(getOAuthClientFilter(accessToken, accessTokenSecret));
-
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
         String response = r.delete(String.class);
         /*
         final JSONObject root = (JSONObject) JSONValue.parse(response);
@@ -318,28 +348,22 @@ public class IndivoModule
      *
      * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:get-user-preferences}
      *
-     * @param accessToken accessToken
-     * @param accessTokenSecret access token secret
+     * 
+     * 
      * @param accountId The email identifier of the Indivo account
      * @param phaId The email identifier of the Indivo user app
+     * 
+     * @throws java.lang.Exception if not successful
      * 
      * @return app-specific user preferences. Preferences format is defined by the app setting the preferences, and will therefore vary.
      */
     @Processor
-    public InputStream getUserPreferences(@OAuthAccessToken String accessToken,
-			                              @OAuthAccessTokenSecret String accessTokenSecret,
-			                              String accountId,
+    public InputStream getUserPreferences(String accountId,
 			                              String phaId) throws Exception
     {
     	final String apiUrl = getApiUrl("accounts/" + accountId + "/apps/" + phaId + "/preferences");
 
-        WebResource r = getClient().resource(apiUrl);
-
-        if (isDebug())
-        {
-            r.addFilter(new LoggingFilter());
-        }
-        r.addFilter(getOAuthClientFilter(accessToken, accessTokenSecret));
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
 
         InputStream response = r.get(InputStream.class);
 
@@ -351,62 +375,3609 @@ public class IndivoModule
      *
      * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:set-user-preferences}
      *
-     * @param accessToken accessToken
-     * @param accessTokenSecret access token secret
+     * 
+     * 
      * @param accountId The email identifier of the Indivo account
      * @param phaId The email identifier of the Indivo user app
+     * 
+     * @throws java.lang.Exception if not successful
      * 
      * @return <ok/> if successful
      */
     @Processor
-    public String setUserPreferences(@OAuthAccessToken String accessToken,
-			                              @OAuthAccessTokenSecret String accessTokenSecret,
-			                              String accountId,
+    public String setUserPreferences(String accountId,
 			                              String phaId) throws Exception
     {
     	final String apiUrl = getApiUrl("accounts/" + accountId + "/apps/" + phaId + "/preferences");
 
-        WebResource r = getClient().resource(apiUrl);
-
-        if (isDebug())
-        {
-            r.addFilter(new LoggingFilter());
-        }
-        r.addFilter(getOAuthClientFilter(accessToken, accessTokenSecret));
-
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
         String response = r.put(String.class);
 
         return response;
     }
 
-    //======================================
+    /**
+     * Add a new method of authentication to an account.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-authsystem-add}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param userName The username for this account
+     * @param password The password for this account
+     * @param system The identifier of the desired authsystem. password indicates the internal password system.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String accountAuthsystemAdd(String accountId,
+			                              String userName,
+			                              String password,
+			                              @Optional @Default("password") String system) throws Exception
+    {
+    	final String apiUrl = getApiUrl("accounts/" + accountId + "/authsystems/");
+    	
+    	WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);               
+    	
+    	r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+
+         /*
+ 	  		Formdata Parameters:
+ 			 	
+ 			username – The username for this account
+			password – The password for this account
+			system – The identifier of the desired authsystem. password indicates the internal password system.
+ 		 */
+         r = r.queryParam("username", userName);
+         r = r.queryParam("password", password);
+         r = r.queryParam("username", userName);
+
+     	String response = r.post(String.class);
+     	return response;       
+    }
+
+    /**
+     * Change a account’s password.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-password-change}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param oldPassword The existing account password.
+     * @param newPassword The desired new password.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String accountPasswordChange(String accountId,
+			                              String oldPassword,
+			                              String newPassword) throws Exception
+    {
+    	final String apiUrl = getApiUrl("accounts/" + accountId + "/authsystems/password/change");
+    	
+    	WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+    	
+    	r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+
+         /*
+ 	  		Formdata Parameters:
+ 			 	
+ 			new – The desired new password.
+			old – The existing account password.
+ 		 */
+        r = r.queryParam("new", newPassword);
+        r = r.queryParam("old", oldPassword);
+
+     	String response = r.post(String.class);
+     	return response;       
+    }
+
+    /**
+     * Force the password of an account to a given value.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-password-set}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param password The new password to set.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String accountPasswordSet(String accountId,
+			                              String password) throws Exception
+    {
+    	final String apiUrl = getApiUrl("accounts/" + accountId + "/authsystems/password/set");
+    	
+    	WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+            	
+    	r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+
+         /*
+ 	  		Formdata Parameters:
+ 			 	
+ 			password – The new password to set.
+ 		 */
+        r = r.queryParam("password", password);
+
+     	String response = r.post(String.class);
+     	return response;       
+    }
+
+    /**
+     * Force the username of an account to a given value.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-username-set}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param userName The new username to set.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String accountUsernameSet(String accountId,
+			                              String userName) throws Exception
+    {
+    	final String apiUrl = getApiUrl("accounts/" + accountId + "/authsystems/password/set-username");
+    	
+    	WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+            	
+    	r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+
+         /*
+ 	  		Formdata Parameters:
+ 			 	
+ 			username – The new username to set.
+ 		 */
+        r = r.queryParam("username", userName);
+
+     	String response = r.post(String.class);
+     	return response;       
+    }
+    
+    /**
+     * Validate an account’s primary and secondary secrets.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-check-secrets}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param primarySecret A confirmation string sent securely to the patient from Indivo
+     * @param secondarySecret The secondary secret of the account to check.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public InputStream accountCheckSecrets(String accountId,
+			                              String primarySecret,
+			                              String secondarySecret) throws Exception
+    {
+    	final String apiUrl = getApiUrl("accounts/" + accountId + "/check-secrets/" + primarySecret);
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        /*
+	  		Query Parameters:
+ 	
+			secondary_secret – The secondary secret of the account to check.
+		 */
+        r = r.queryParam("secondary_secret", secondarySecret);
+
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+
+    /**
+     * Resets an account if the user has forgotten its password.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-forgot-password}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return the account’s new secondary secret
+     * Example Return Value:
+     * 
+     * <secret>123456</secret>
+     */
+    @Processor
+    public String accountForgotPassword(String accountId) throws Exception
+    {
+    	final String apiUrl = getApiUrl("accounts/" + accountId + "/forgot-password");
+    	
+    	WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+    	
+    	r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+
+     	String response = r.post(String.class);
+     	return response;       
+    }
+
+    /**
+     * List messages in an account’s inbox.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-inbox}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param status The account or document status to filter by
+     * @param orderBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param limit See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param includeArchive whether or not to include archived messages in the result set.
+     * @param offset See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return list of inbox messages.
+     * Example Return Value:
+	 * <Messages>
+	 *  <Message id="879">
+	 *    <sender>doctor@example.indivo.org</sender>
+	 *    <received_at>2010-09-04T14:12:12Z</received_at>
+	 *    <read_at>2010-09-04T17:13:24Z</read_at>
+	 *    <subject>your test results are looking good</subject>
+	 *    <severity>normal</severity>
+	 *    <record id="123" />
+	 *    <attachment num="1" type="http://indivo.org/vocab/xml/documents#Models" size="12546" />
+	 *  </Message>
+	 * 
+	 *  ...
+	 *
+	 * </Messages>
+     */
+    @Processor
+    public InputStream accountInbox(String accountId,
+			                              @Optional String status,
+			                              @Optional String orderBy,
+			                              @Optional String limit,
+			                              @Optional @Default("false") boolean includeArchive,
+			                              @Optional String offset) throws Exception
+    {
+    	final String apiUrl = getApiUrl("accounts/" + accountId + "/inbox/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        /*
+	  		Query Parameters:
+ 	
+			status – The account or document status to filter by
+			order_by – See Query Operators
+			limit – See Query Operators
+			include_archive – 0 or 1: whether or not to include archived messages in the result set.
+			offset – See Query Operators
+		 */
+        if (!StringUtils.isEmpty(status))
+        	r = r.queryParam("status", status);
+        if (!StringUtils.isEmpty(orderBy))
+        	r = r.queryParam("order_by", orderBy);
+        if (!StringUtils.isEmpty(limit))
+        	r = r.queryParam("limit", limit);
+        if (!StringUtils.isEmpty(offset))
+        	r = r.queryParam("offset", offset);
+
+        r = r.queryParam("include_archive", includeArchive ? "1" : "0");
+
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+
+    /**
+     * Send a message to an account.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-send-message}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param body The message body. Defaults to [no body].
+     * @param severity The importance of the message. Options are low, medium, high. Defaults to low.
+     * @param bodyType The formatting of the message body. Options are plaintext, markdown. Defaults to plaintext.
+     * @param messageId An external identifier for the message.
+     * @param subject The message subject. Defaults to [no subject].
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String accountSendMessage(String accountId,
+			                         @Optional @Default("[no body]") String body,
+			                         @Optional @Default("low") Severity severity,
+			                         @Optional @Default("plaintext") BodyType bodyType,
+			                         String messageId,
+			                         @Optional @Default ("[no subject]") String subject) throws Exception
+    {
+    	final String apiUrl = getApiUrl("accounts/" + accountId + "/inbox/");
+    	
+    	WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+    	
+    	r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        /*
+         * Formdata Parameters:
+            
+            body – The message body. Defaults to [no body].
+            severity – The importance of the message. Options are low, medium, high. Defaults to low.
+            body_type – The formatting of the message body. Options are plaintext, markdown. Defaults to plaintext.
+            message_id – An external identifier for the message.
+            subject – The message subject. Defaults to [no subject].
+        
+         */
+    	r = r.queryParam("body", body);
+        r = r.queryParam("severity", severity.getSeverity());
+        r = r.queryParam("body_type", bodyType.getBodyType());
+        r = r.queryParam("message_id", messageId);
+        r = r.queryParam("subject", subject);
+        
+     	String response = r.post(String.class);
+     	return response;       
+    }
+    
+    /**
+     * Retrieve an individual message from an account’s inbox.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-inbox-message}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param messageId An external identifier for the message.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return XML describing the message.
+     * Example Return Value:
+     * <Message id="879">
+     *   <sender>doctor@example.indivo.org</sender>
+     *   <received_at>2010-09-04T14:12:12Z</received_at>
+     *   <read_at>2010-09-04T17:13:24Z</read_at>
+     *   <archived_at>2010-09-04T17:15:24Z</archived_at>
+     *   <subject>your test results are looking good</subject>
+     *   <body>Great results!
+     *  It seems you'll live forever!</body>
+     *   <severity>normal</severity>
+     *   <record id="123" />
+     *   <attachment num="1" type="http://indivo.org/vocab/xml/documents#Models" size="12546" />
+     * </Message>
+     */
+    @Processor
+    public InputStream accountInboxMessage(String accountId,
+                                          String messageId) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/inbox/" + messageId);
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+
+    /**
+     * Archive a message.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-message-archive}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param messageId An external identifier for the message.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String accountMessageArchive(String accountId,
+                                     String messageId) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/inbox/" + messageId + "/archive");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        
+        String response = r.post(String.class);
+        return response;       
+    }
+    
+    /**
+     * Accept a message attachment into the record it corresponds to.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-inbox-message-attachment-accept}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param messageId An external identifier for the message.
+     * @param attachmentNumber The 1-indexed number corresponding to the message attachment
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String accountInboxMessageAttachmentAccept(String accountId,
+                                     String messageId,
+                                     String attachmentNumber) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/inbox/" + messageId + "/attachments/" + attachmentNumber + "/accept");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        
+        String response = r.post(String.class);
+        return response;       
+    }
+
+    /**
+     * Set basic information about an account.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-info-set}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param contactEmail A valid email at which to reach the account holder.
+     * @param fullName The full name of the account.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String accountInfoSet(String accountId,
+                                     String contactEmail,
+                                     String fullName) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/info-set");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        /*
+         * Formdata Parameters:
+    
+            contact_email – A valid email at which to reach the account holder.
+            full_name – The full name of the account.
+
+         */
+        r = r.queryParam("contact_email", contactEmail);
+        r = r.queryParam("full_name", fullName);
+        
+        String response = r.post(String.class);
+        return response;       
+    }
+
+    /**
+     * Initialize an account, activating it.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-initialize}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param primarySecret A confirmation string sent securely to the patient from Indivo
+     * @param secondarySecret A secondary secret
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String accountInitialize(String accountId,
+                                     String primarySecret,
+                                     String secondarySecret) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/initialize/" + primarySecret);
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        /*
+         * Formdata Parameters:
+         * 
+            secondary_secret
+         */
+        r = r.queryParam("secondary_secret", secondarySecret);
+        
+        String response = r.post(String.class);
+        return response;       
+    }
+    
+    /**
+     * List an account’s notifications.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-notifications}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param status The account or document status to filter by
+     * @param orderBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param limit See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param offset See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return list of the account’s notifications.
+     * Example Return Value:
+     * <Notifications>
+     *   <Notification id="468">
+     *     <sender>labs@apps.indivo.org</sender>
+     *     <received_at>2010-09-03T15:12:12Z</received_at>
+     *     <content>A new lab result has been delivered to your account</content>
+     *     <record id="123" label="Joe User" />
+     *     <document id="579" label="Lab Test 2" />
+     *   </Notification>
+     * 
+     *   ...
+     * 
+     * </Notifications>
+     */
+    @Processor
+    public InputStream accountNotifications(String accountId,
+                                          @Optional String status,
+                                          @Optional String orderBy,
+                                          @Optional String limit,
+                                          @Optional String offset) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/notifications/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        /*
+            Query Parameters:
+    
+            status – The account or document status to filter by
+            order_by – See Query Operators
+            limit – See Query Operators
+            offset – See Query Operators
+         */
+        if (!StringUtils.isEmpty(status))
+            r = r.queryParam("status", status);
+        if (!StringUtils.isEmpty(orderBy))
+            r = r.queryParam("order_by", orderBy);
+        if (!StringUtils.isEmpty(limit))
+            r = r.queryParam("limit", limit);
+        if (!StringUtils.isEmpty(offset))
+            r = r.queryParam("offset", offset);
+
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+    
+    /**
+     * List the carenets that an account has access to.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-permissions}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return list of carenets
+     * Example Return Value:
+     * <Carenets record_id="01234">
+     *     <Carenet id="456" name="family" mode="explicit" />
+     *     <Carenet id="567" name="school" mode="explicit" />
+     * </Carenets>
+     */
+    @Processor
+    public InputStream accountPermissions(String accountId) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/permissions/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+
+    /**
+     * Display an account’s primary secret.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-primary-secret}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     *  
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return the primary secret.
+     * Example Return Value:
+     * <secret>123absxzyasdg13b</secret>
+     */
+    @Processor
+    public InputStream accountPrimarySecret(String accountId) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/primary-secret");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+
+    /**
+     * List all available records for an account.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-record-list}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * @param status The account or document status to filter by
+     * @param orderBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param limit See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param offset See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return list of records owned or shared with the account.
+     * Example Return Value:
+     * <Records>
+     *   <Record id="123" label="John R. Smith" />
+     *   <Record id="234" label="John R. Smith Jr. (shared)" shared="true" role_label="Guardian" />
+     *   <Record id="345" label="Juanita R. Smith (carenet)" shared="true" carenet_id="678" carenet_name="family" />
+     * 
+     *   ...
+     * 
+     * </Records>
+     */
+    @Processor
+    public InputStream accountRecordList(String accountId,
+                                          @Optional String status,
+                                          @Optional String orderBy,
+                                          @Optional String limit,
+                                          @Optional String offset) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/records/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        /*
+        Query Parameters:
+
+        status – The account or document status to filter by
+        order_by – See Query Operators
+        limit – See Query Operators
+        offset – See Query Operators
+         */
+        if (!StringUtils.isEmpty(status))
+            r = r.queryParam("status", status);
+        if (!StringUtils.isEmpty(orderBy))
+            r = r.queryParam("order_by", orderBy);
+        if (!StringUtils.isEmpty(limit))
+            r = r.queryParam("limit", limit);
+        if (!StringUtils.isEmpty(offset))
+            r = r.queryParam("offset", offset);
+        
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+
+    /**
+     * Reset an account to an uninitialized state.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-reset}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String accountReset(String accountId) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/reset");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        
+        String response = r.post(String.class);
+        return response;       
+    }
+    
+    /**
+     * Return the secondary secret of an account.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-secret}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     *  
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return the secondary secret.
+     * Example Return Value:
+     * <secret>123456</secret>
+     */
+    @Processor
+    public InputStream accountSecret(String accountId) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/secret");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+    
+    /**
+     * Sends an account user their primary secret in case they lost it.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-resend-secret}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String accountResendSecret(String accountId) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/secret-resend");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        
+        String response = r.post(String.class);
+        return response;       
+    }
+
+    /**
+     * Set the state of an account.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:account-set-state}
+     *
+     * 
+     * 
+     * @param accountId The email identifier of the Indivo account
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String accountSetState(String accountId) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + accountId + "/set-state");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        
+        String response = r.post(String.class);
+        return response;       
+    }
+
+    //======================== APPS ==============================================//-
+    /**
+     * List all available userapps.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:all-phas}
+     *
+     * 
+     * 
+     *  
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return list of app manifests as JSON on success.
+     * Example Return Value:
+     * [
+     * {
+     *     "name" : "SMART Problems",
+     *     "description" : "Display problems in a table view",
+     *     "author" : "Josh Mandel, Children's Hospital Boston",
+     *     "id" : "problem-list@apps.smartplatforms.org",
+     *     "version" : ".1a",
+     * 
+     *     "mode" : "ui",
+     *     "scope": "record",
+     * 
+     *     "index" : "http://fda.gping.org:8012/framework/problem_list/index.html",
+     *     "icon" : "http://fda.gping.org:8012/framework/problem_list/icon.png",
+     * 
+     *     "requires" : {
+     *         "http://smartplatforms.org/terms#Problem": {
+     *             "methods": ["GET"]
+     *         }
+     *     }
+     * },
+     * 
+     * ... other apps ...
+     * 
+     * ]
+     */
+    @Processor
+    public JSONObject allPhas() throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.get(String.class);
+        JSONObject jsonResponse = (JSONObject) JSONValue.parse(response);
+        return jsonResponse;
+    }
+
+    /**
+     * List SMART manifests for all available userapps. [SMART-COMPATIBLE]
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:all-manifests}
+     *
+     * 
+     * 
+     *  
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return SMART-style manifests for each app.
+     * Example Return Value:
+     * [
+     * {
+     *     "name" : "SMART Problems",
+     *     "description" : "Display problems in a table view",
+     *     "author" : "Josh Mandel, Children's Hospital Boston",
+     *     "id" : "problem-list@apps.smartplatforms.org",
+     *     "version" : ".1a",
+     * 
+     *     "mode" : "ui",
+     *     "scope": "record",
+     * 
+     *     "index" : "http://fda.gping.org:8012/framework/problem_list/index.html",
+     *     "icon" : "http://fda.gping.org:8012/framework/problem_list/icon.png",
+     * 
+     *     "requires" : {
+     *         "http://smartplatforms.org/terms#Problem": {
+     *             "methods": ["GET"]
+     *         }
+     *     }
+     * },
+     * 
+     * ... other apps ...
+     * 
+     * ]
+     */
+    @Processor
+    public JSONObject allManifests() throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/manifests/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.get(String.class);
+        JSONObject jsonResponse = (JSONObject) JSONValue.parse(response);
+        return jsonResponse;
+    }
+    
+    /**
+     * Return a description of a single userapp. [SMART-COMPATIBLE]
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:pha}
+     *
+     * 
+     * 
+     * @param phaEmail The email identifier of the Indivo user app
+     *  
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return the app’s JSON manifest
+     * Example Return Value:
+     * {
+     *     "name" : "SMART Problems",
+     *     "description" : "Display problems in a table view",
+     *     "author" : "Josh Mandel, Children's Hospital Boston",
+     *     "id" : "problem-list@apps.smartplatforms.org",
+     *     "version" : ".1a",
+     * 
+     *     "mode" : "ui",
+     *    "scope": "record",
+     * 
+     *     "index" : "http://fda.gping.org:8012/framework/problem_list/index.html",
+     *     "icon" : "http://fda.gping.org:8012/framework/problem_list/icon.png",
+     * 
+     *     "requires" : {
+     *         "http://smartplatforms.org/terms#Problem": {
+     *             "methods": ["GET"]
+     *         }
+     *     }
+     * }
+     */
+    @Processor
+    public JSONObject pha(String phaEmail) throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/" + phaEmail);
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.get(String.class);
+        JSONObject jsonResponse = (JSONObject) JSONValue.parse(response);
+        return jsonResponse;
+    }
+    
+    /**
+     * List app-specific documents.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:app-document-list}
+     *
+     * 
+     * 
+     * @param phaEmail The email identifier of the Indivo user app
+     * @param status The account or document status to filter by
+     * @param orderBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param type  The Indivo document type to filter by
+     * @param limit See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param offset See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators) 
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return A list of documents
+     * Example Return Value:
+     * <Documents record_id="" total_document_count="4" pha="problems@apps.indivo.org">
+     *   <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *     <createdAt>2009-05-04T17:05:33</createdAt>
+     *     <creator id="steve@indivo.org" type="account">
+     *       <fullname>Steve Zabak</fullname>
+     *     </creator>
+     *     <suppressedAt>2009-05-06T17:05:33</suppressedAt>
+     *     <suppressor id="steve@indivo.org" type="account">
+     *       <fullname>Steve Zabak</fullname>
+     *     </suppressor>
+     *     <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *     <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *     <label>HBA1C reading</label>
+     *     <status>active</status>
+     *     <nevershare>false</nevershare>
+     *     <relatesTo>
+     *       <relation type="http://indivo.org/vocab/documentrels#attachment" count="1" />
+     *       <relation type="http://indivo.org/vocab/documentrels#annotation" count="5" />
+     *     </relatesTo>
+     *     <isRelatedFrom>
+     *       <relation type="http://indivo.org/vocab/documentrels#interpretation" count="1" />
+     *     </isRelatedFrom>
+     *   </Document>
+     * 
+     *   ...
+     * 
+     * </Documents>
+     */
+    @Processor
+    public InputStream appDocumentList(String phaEmail, 
+                                          @Optional String status,
+                                          @Optional String orderBy,
+                                          @Optional String type,
+                                          @Optional String limit,
+                                          @Optional String offset) throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/" + phaEmail + "/documents/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        /*
+        Query Parameters:
+
+        status – The account or document status to filter by
+        order_by – See Query Operators
+        type -  The Indivo document type to filter by
+        limit – See Query Operators
+        offset – See Query Operators
+         */
+        if (!StringUtils.isEmpty(status))
+            r = r.queryParam("status", status);
+        if (!StringUtils.isEmpty(orderBy))
+            r = r.queryParam("order_by", orderBy);
+        if (!StringUtils.isEmpty(type))
+            r = r.queryParam("type", type);
+        if (!StringUtils.isEmpty(limit))
+            r = r.queryParam("limit", limit);
+        if (!StringUtils.isEmpty(offset))
+            r = r.queryParam("offset", offset);
+        
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+    
+    /**
+     * Create an app-specific Indivo document.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:app-document-create}
+     *
+     * 
+     * 
+     * @param phaEmail The email identifier of the Indivo user app
+     * @param document The raw content of the document to create.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return the metadata of the created document
+     * Example Return Value:
+     * 
+     * <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *   <createdAt>2009-05-04T17:05:33</createdAt>
+     *   <creator id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </creator>
+     *   <suppressedAt>2009-05-06T17:05:33</suppressedAt>
+     *   <suppressor id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </suppressor>
+     *   <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *   <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *   <label>HBA1C reading</label>
+     *   <status>active</status>
+     *   <nevershare>false</nevershare>
+     *   <relatesTo>
+     *     <relation type="http://indivo.org/vocab/documentrels#attachment" count="1" />
+     *     <relation type="http://indivo.org/vocab/documentrels#annotation" count="5" />
+     *   </relatesTo>
+     *   <isRelatedFrom>
+     *     <relation type="http://indivo.org/vocab/documentrels#interpretation" count="1" />
+     *   </isRelatedFrom>
+     * </Document>
+     */
+    @Processor
+    public String appDocumentCreate(String phaEmail,
+                                     Object document) throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/" + phaEmail + "/documents/");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.post(String.class, document);
+        return response;       
+    }    
+    
+    /**
+     * Create an app-specific Indivo document with an associated external id.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:app-document-create-or-update-ext}
+     *
+     * 
+     * 
+     * @param externalId the external identifier of the desired resource
+     * @param phaEmail The email identifier of the Indivo user app
+     * @param document The raw content of the document to create.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return the metadata of the created or updated document
+     * Example Return Value:
+     * 
+     * <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *   <createdAt>2009-05-04T17:05:33</createdAt>
+     *   <creator id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </creator>
+     *   <suppressedAt>2009-05-06T17:05:33</suppressedAt>
+     *   <suppressor id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </suppressor>
+     *   <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *   <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *   <label>HBA1C reading</label>
+     *   <status>active</status>
+     *   <nevershare>false</nevershare>
+     * </Document>
+     */
+    @Processor
+    public String appDocumentCreateOrUpdateExt(String externalId,
+                                     String phaEmail,
+                                     Object document) throws Exception
+    {
+        final String apiUrl = getApiUrl("accounts/" + phaEmail + "/documents/external/" + externalId);
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.put(String.class, document);
+        return response;       
+    }    
+    
+    /**
+     * Fetch the metadata of an app-specific document identified by external id.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:app-document-meta-ext}
+     *
+     * 
+     * 
+     * @param externalId The external identifier of the desired resource
+     * @param phaEmail The email identifier of the Indivo user app
+     *  
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return metadata describing the specified document
+     * Example Return Value:
+     * <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *   <createdAt>2009-05-04T17:05:33</createdAt>
+     *   <creator id="problems@apps.indivo.org" type="pha">
+     *     <fullname>Steve Zabak</fullname>
+     *   </creator>
+     *   <suppressedAt>2009-05-06T17:05:33</suppressedAt>
+     *   <suppressor id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </suppressor>
+     *   <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *   <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *   <label>HBA1C reading</label>
+     *   <status>active</status>
+     *   <nevershare>false</nevershare>
+     * </Document>
+     */
+    @Processor
+    public InputStream appDocumentMetaExt(String externalId,
+                                          String phaEmail) throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/" + phaEmail + "/documents/external/" + externalId + "/meta");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+    
+    /**
+     * Delete an app-specific document.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:app-document-delete}
+     *
+     * 
+     * 
+     * @param phaEmail The email identifier of the Indivo user app
+     * @param documentId The unique identifier of the Indivo document
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String appDocumentDelete(String phaEmail,
+                                     String documentId) throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/" + phaEmail + "/documents/" + documentId);
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.delete(String.class);
+        return response;       
+    }
+
+    /**
+     * Retrieve an app-specific document.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:app-specific-document}
+     *
+     * 
+     * 
+     * @param phaEmail The email identifier of the Indivo user app
+     * @param documentId The unique identifier of the Indivo document
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return raw content of the document
+     * Example Return Value:
+     * 
+     * <DefaultProblemsPreferences record_id="123">
+     *   <Preference name="hide_void" value="true" />
+     *   <Preference name="show_rels" value="false" />
+     * </DefaultProblemsPreferences>
+     */
+    @Processor
+    public InputStream appSpecificDocument(String phaEmail,
+                                     String documentId) throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/" + phaEmail + "/documents/" + documentId);
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        InputStream response = r.get(InputStream.class);
+        return response;       
+    }
+
+    /**
+     * Create or Overwrite an app-specific Indivo document.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:app-document-create-or-update}
+     *
+     * 
+     * 
+     * @param phaEmail The email identifier of the Indivo user app
+     * @param documentId The unique identifier of the Indivo document
+     * @param document The raw content of the document to create.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return metadata describing the created or updated document
+     * Example Return Value:
+     * 
+     * <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *   <createdAt>2009-05-04T17:05:33</createdAt>
+     *   <creator id="problems@apps.indivo.org" type="pha">
+     *   </creator>
+     *   <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *   <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *   <label>HBA1C reading preferences</label>
+     *   <status>active</status>
+     *   <nevershare>false</nevershare>
+     * </Document>
+     */
+    @Processor
+    public String appDocumentCreateOrUpdate(String phaEmail,
+                                     String documentId,
+                                     Object document) throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/" + phaEmail + "/documents/" + documentId);
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.put(String.class, document);
+        return response;       
+    }
+
+    /**
+     * Set the label of an app-specific document.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:app-document-label}
+     *
+     * 
+     * 
+     * @param phaEmail The email identifier of the Indivo user app
+     * @param documentId The unique identifier of the Indivo document
+     * @param label The new label for the document
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return metadata describing the re-labeled document
+     * Example Return Value:
+     * 
+     * <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *   <createdAt>2009-05-04T17:05:33</createdAt>
+     *   <creator id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </creator>
+     *   <suppressedAt>2009-05-06T17:05:33</suppressedAt>
+     *   <suppressor id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </suppressor>
+     *   <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *   <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *   <label>RELABELED: New HBA1C reading</label>
+     *   <status>active</status>
+     *   <nevershare>false</nevershare>
+     *   <relatesTo>
+     *     <relation type="http://indivo.org/vocab/documentrels#attachment" count="1" />
+     *     <relation type="http://indivo.org/vocab/documentrels#annotation" count="5" />
+     *   </relatesTo>
+     *   <isRelatedFrom>
+     *     <relation type="http://indivo.org/vocab/documentrels#interpretation" count="1" />
+     *   </isRelatedFrom>
+     * </Document>
+     */
+    @Processor
+    public String appDocumentLabel(String phaEmail,
+                                     String documentId,
+                                     Object label) throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/" + phaEmail + "/documents/" + documentId + "/label");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.put(String.class, label);
+        return response;       
+    }
+    
+    /**
+     * Fetch the metadata of an app-specific document.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:app-document-meta}
+     *
+     * 
+     * 
+     * @param phaEmail The email identifier of the Indivo user app
+     * @param documentId The unique identifier of the Indivo document
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return the document metadata
+     * Example Return Value:
+     * 
+     * <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *   <createdAt>2009-05-04T17:05:33</createdAt>
+     *   <creator id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </creator>
+     *   <suppressedAt>2009-05-06T17:05:33</suppressedAt>
+     *   <suppressor id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </suppressor>
+     *   <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *   <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *   <label>HBA1C reading</label>
+     *   <status>active</status>
+     *   <nevershare>false</nevershare>
+     *   <relatesTo>
+     *     <relation type="http://indivo.org/vocab/documentrels#attachment" count="1" />
+     *     <relation type="http://indivo.org/vocab/documentrels#annotation" count="5" />
+     *   </relatesTo>
+     *   <isRelatedFrom>
+     *     <relation type="http://indivo.org/vocab/documentrels#interpretation" count="1" />
+     *   </isRelatedFrom>
+     * </Document>
+     */
+    @Processor
+    public InputStream appDocumentMeta(String phaEmail,
+                                     String documentId) throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/" + phaEmail + "/documents/" + documentId + "/meta");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        InputStream response = r.get(InputStream.class);
+        return response;       
+    }
+    
+    /**
+     * Return a SMART manifest for a single userapp. [SMART-COMPATIBLE]
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:app-manifest}
+     *
+     * 
+     * 
+     * @param phaEmail The email identifier of the Indivo user app
+     *  
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return A SMART-style manifest for the app.
+     * Example Return Value:
+     * {
+     *     "name" : "SMART Problems",
+     *     "description" : "Display problems in a table view",
+     *     "author" : "Josh Mandel, Children's Hospital Boston",
+     *     "id" : "problem-list@apps.smartplatforms.org",
+     *     "version" : ".1a",
+     * 
+     *     "mode" : "ui",
+     *    "scope": "record",
+     * 
+     *     "index" : "http://fda.gping.org:8012/framework/problem_list/index.html",
+     *     "icon" : "http://fda.gping.org:8012/framework/problem_list/icon.png",
+     * 
+     *     "requires" : {
+     *         "http://smartplatforms.org/terms#Problem": {
+     *             "methods": ["GET"]
+     *         }
+     *     }
+     * }
+     */
+    @Processor
+    public JSONObject appManifest(String phaEmail) throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/" + phaEmail + "/manifest");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.get(String.class);
+        JSONObject jsonResponse = (JSONObject) JSONValue.parse(response);
+        return jsonResponse;
+    }
+    
+    /**
+     * Return a list of all records that have this pha enabled.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:app-record-list}
+     *
+     * 
+     * 
+     * @param phaEmail The email identifier of the Indivo user app
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return  list of records on success.
+     * Example Return Value:
+     * 
+     * <Records>
+     *   <Record id="123" label="John R. Smith" />
+     *   <Record id="234" label="Frank Frankson" />
+     * 
+     *   ...
+     * 
+     * </Records>
+     */
+    @Processor
+    public InputStream appRecordList(String phaEmail) throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/" + phaEmail + "/records/");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        InputStream response = r.get(InputStream.class);
+        return response;       
+    }
+    
+    /**
+     * Fetch an access token for an autonomous app to access a record.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:autonomous-access-token}
+     *
+     * 
+     * 
+     * @param recordId The id string associated with the Indivo record
+     * @param phaEmail The email identifier of the Indivo user app
+     * @param document The raw content of the document to create.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return a valid access token for the app bound to the record on success
+     * Example Return Value:
+     * oauth_token=abcd1fw3gasdgh3&oauth_token_secret=jgrlhre4291hfjas&xoauth_indivo_record_id=123
+     *
+     */
+    @Processor
+    public String autonomousAccessToken(String recordId,
+                                     String phaEmail) throws Exception
+    {
+        final String apiUrl = getApiUrl("apps/" + phaEmail + "/records/" + recordId + "/access_token");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.post(String.class);
+        return response;       
+    }        
+    
+    /**
+     * SMART Capabilities [SMART-COMPATIBLE]
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:smart-capabilities}
+     *
+     * 
+     * 
+     *  
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return JSON formatted SMART capabilities
+     * Example Return Value:
+     * {
+     *     "http://smartplatforms.org/terms#Demographics": {
+     *         "methods": [
+     *             "GET"
+     *         ]
+     *     },
+     *     "http://smartplatforms.org/terms#Encounter": {
+     *         "methods": [
+     *             "GET"
+     *         ]
+     *     },
+     *     "http://smartplatforms.org/terms#VitalSigns": {
+     *         "methods": [
+     *             "GET"
+     *         ]
+     *     }
+     * }
+     */
+    @Processor
+    public JSONObject smartCapabilities() throws Exception
+    {
+        final String apiUrl = getApiUrl("capabilities/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.get(String.class);
+        JSONObject jsonResponse = (JSONObject) JSONValue.parse(response);
+        return jsonResponse;
+    }
+    
+  //======================== CARENETS ==============================================//-
+    /**
+     * List the accounts in a carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-account-list}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return  list of accounts in the specified carenet.
+     * Example Return Value:
+     * 
+     * <CarenetAccounts>
+     *   <CarenetAccount id="johndoe@indivo.org" fullName="John Doe" write="true" />
+     * 
+     *   ...
+     * 
+     * </CarenetAccounts>
+     */
+    @Processor
+    public InputStream carenetAccountList(String carenetId) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/accounts/");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        InputStream response = r.get(InputStream.class);
+        return response;       
+    }    
+    
+    /**
+     * Add an account to a carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-account-create}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param write Whether this account can write to the carenet (optional, true by default)
+     * @param accountId An identifier for the account. Must be a valid email address.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return @return <ok/> if successful
+     *
+     */
+    @Processor
+    public String carenetAccountCreate(String carenetId,
+                                       @Optional @Default("true") boolean write,
+                                       String accountId) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/accounts/");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+
+        /*
+        Formdata Parameters:
+            
+        write – true or false. Whether this account can write to the carenet.
+        account_id – An identifier for the account. Must be a valid email address.
+        */
+
+        r = r.queryParam("write", write ? "true" : "false");
+        r = r.queryParam("account_id", accountId);
+        
+        String response = r.post(String.class);
+        return response;       
+    }        
+    
+    /**
+     * Remove an account from a carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-account-delete}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param accountId An identifier for the account. Must be a valid email address.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return @return <ok/> if successful
+     *
+     */
+    @Processor
+    public String carenetAccountDelete(String carenetId,
+                                       String accountId) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/accounts/" + accountId);
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.delete(String.class);
+        return response;       
+    }        
+
+    /**
+     * List the permissions of an account within a carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-account-permissions}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param accountId An identifier for the account. Must be a valid email address.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return list of document types that the account can access within a carenet. Currently always returns all document types.
+     * Example Return Value:
+     * 
+     * <Permissions>
+     *   <DocumentType type="*" write="true" />
+     * </Permissions>
+     */
+    @Processor
+    public InputStream carenetAccountPermissions(String carenetId,
+                                                 String accountId) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/accounts/" + accountId + "/permissions");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        InputStream response = r.get(InputStream.class);
+        return response;       
+    }    
+
+    /**
+     * List Apps within a given carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-apps-list}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return manifests for the apps on success.
+     * Example Return Value:
+     * 
+     * [
+     * {
+     *     "name" : "SMART Problems",
+     *     "description" : "Display problems in a table view",
+     *     "author" : "Josh Mandel, Children's Hospital Boston",
+     *     "id" : "problem-list@apps.smartplatforms.org",
+     *     "version" : ".1a",
+     * 
+     *     "mode" : "ui",
+     *     "scope": "record",
+     * 
+     *     "index" : "http://fda.gping.org:8012/framework/problem_list/index.html",
+     *     "icon" : "http://fda.gping.org:8012/framework/problem_list/icon.png",
+     * 
+     *     "requires" : {
+     *         "http://smartplatforms.org/terms#Problem": {
+     *             "methods": ["GET"]
+     *         }
+     *     }
+     * },
+     * 
+     * ... other apps ...
+     * 
+     * ]
+     */
+    @Processor
+    public JSONObject carenetAppsList(String carenetId) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/apps/");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.get(String.class);
+        JSONObject jsonResponse = (JSONObject) JSONValue.parse(response);
+        return jsonResponse;
+    }    
+    
+    /**
+     * Remove an app from a given carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-apps-delete}
+     *
+     * 
+     * 
+     * @param carenetId The email identifier of the Indivo account
+     * @param phaEmail The email identifier of the Indivo user app
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String carenetAppsDelete(String carenetId,
+                                        String phaEmail) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/apps/" + phaEmail);
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.delete(String.class);
+
+        return response;
+    }
+    
+    /**
+     * Add an app to a carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-apps-create}
+     *
+     * 
+     * 
+     * @param carenetId The email identifier of the Indivo account
+     * @param phaEmail The email identifier of the Indivo user app
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String carenetAppsCreate(String carenetId,
+                                        String phaEmail) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/apps/" + phaEmail);
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.put(String.class);
+
+        return response;
+    }
+ 
+    /**
+     * Read demographics from a carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-read-demographics}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param responseFormat one of application/rdf+xml (SMART RDF/XML), application/json (SDMJ), or application/xml (SDMX). Default is application/rdf+xml
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return demographics formatted in the requested response_format (default application/rdf+xml) on success
+     * Example Return Value:
+     * 
+     * application/rdf+xml:
+     * 
+     *     <?xml version="1.0" encoding="UTF-8"?>
+     *     <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/"
+     *          xmlns:foaf="http://xmlns.com/foaf/0.1/"
+     *          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     *          xmlns:sp="http://smartplatforms.org/terms#"   xmlns:v="http://www.w3.org/2006/vcard/ns#">
+     *     <rdf:Description rdf:nodeID="_6730841b-05df-445f-8695-ed64197f4e6a">
+     *         <v:family-name>William</v:family-name>
+     *         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Name"/>
+     *         <v:given-name>Robinson</v:given-name>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:nodeID="_bcf66b59-e438-49b2-b572-99af4319b297">
+     *         <rdf:value>800-870-3011</rdf:value>
+     *         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Tel"/>
+     *         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Home"/>
+     *         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Pref"/>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:nodeID="_8cbe3da1-fb53-4d31-80b6-19e0d04220ad">
+     *         <dcterms:identifier>http://indivo.org/records/96ff9eb2-3b18-4a0e-9df8-5a731b96d5d6</dcterms:identifier>
+     *         <sp:system>Indivo Record</sp:system>
+     *         <dcterms:title>Indivo Record 96ff9eb2-3b18-4a0e-9df8-5a731b96d5d6</dcterms:title>
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:nodeID="_451ade87-b519-4c92-8d07-2bbfcb23999c">
+     *         <rdf:value>800-870-3011</rdf:value>
+     *         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Tel"/>
+     *         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Home"/>
+     *         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Pref"/>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:about="http://indivo.org/records/96ff9eb2-3b18-4a0e-9df8-5a731b96d5d6">
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms#MedicalRecord"/>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:about="http://indivo.org/records/96ff9eb2-3b18-4a0e-9df8-5a731b96d5d6/demographics">
+     *         <v:tel rdf:nodeID="_bcf66b59-e438-49b2-b572-99af4319b297"/>
+     *         <v:tel rdf:nodeID="_451ade87-b519-4c92-8d07-2bbfcb23999c"/>
+     *         <sp:email>william.robinson@example.com</sp:email>
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms#Demographics"/>
+     *         <v:bday rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1965-08-09</v:bday>
+     *         <v:adr rdf:nodeID="_9f06ee63-3704-4b2a-9c2a-109cc9c99a57"/>
+     *         <sp:belongsTo rdf:resource="http://indivo.org/records/96ff9eb2-3b18-4a0e-9df8-5a731b96d5d6"/>
+     *         <foaf:gender>male</foaf:gender>
+     *         <sp:preferredLanguage>EN</sp:preferredLanguage>
+     *         <v:n rdf:nodeID="_6730841b-05df-445f-8695-ed64197f4e6a"/>
+     *         <sp:medicalRecordNumber rdf:nodeID="_8cbe3da1-fb53-4d31-80b6-19e0d04220ad"/>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:nodeID="_9f06ee63-3704-4b2a-9c2a-109cc9c99a57">
+     *         <v:street-address>23 Church Rd</v:street-address>
+     *         <v:country>USA</v:country>
+     *         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Address"/>
+     *         <v:region>OK</v:region>
+     *         <v:locality>Bixby</v:locality>
+     *         <v:postal-code>74008</v:postal-code>
+     *     </rdf:Description>
+     * </rdf:RDF>
+     * 
+     * application/xml:
+     * 
+     *     <Models>
+     *         <Model name="Demographics" documentId="44190967-cbaa-43a7-a98c-9f97f094ef2b">
+     *             <Field name="bday">1965-08-09</Field>
+     *             <Field name="email">william.robinson@example.com</Field>
+     *             <Field name="ethnicity"/>
+     *             <Field name="gender">male</Field>
+     *             <Field name="preferred_language">EN</Field>
+     *             <Field name="race"/>
+     *             <Field name="name_given">Robinson</Field>
+     *             <Field name="name_suffix"/>
+     *             <Field name="name_family">William</Field>
+     *             <Field name="name_prefix"/>
+     *             <Field name="tel_2_type">h</Field>
+     *             <Field name="tel_2_preferred_p">True</Field>
+     *             <Field name="tel_2_number">800-870-3011</Field>
+     *             <Field name="adr_region">OK</Field>
+     *             <Field name="adr_country">USA</Field>
+     *             <Field name="adr_postalcode">74008</Field>
+     *             <Field name="adr_city">Bixby</Field>
+     *             <Field name="adr_street">23 Church Rd</Field>
+     *             <Field name="tel_1_type">h</Field>
+     *             <Field name="tel_1_preferred_p">True</Field>
+     *             <Field name="tel_1_number">800-870-3011</Field>
+     *         </Model>
+     *     </Models>
+     * 
+     * application/json:
+     * 
+     *     [
+     *         {
+     *             "__modelname__": "Demographics",
+     *             "__documentid__": "44190967-cbaa-43a7-a98c-9f97f094ef2b",
+     *             "name_given": "Robinson",
+     *             "name_family": "William",
+     *             "name_prefix": null,
+     *             "name_suffix": null,
+     *             "gender": "male",
+     *             "race": null,
+     *             "ethnicity": null,
+     *             "bday": "1965-08-09",
+     *             "email": "william.robinson@example.com",
+     *             "preferred_language": "EN",
+     *             "tel_1_type": "h",
+     *             "tel_1_number": "800-870-3011",
+     *             "tel_1_preferred_p": true,
+     *             "tel_2_type": "h",
+     *             "tel_2_number": "800-870-3011",
+     *             "tel_2_preferred_p": true,
+     *             "adr_street": "23 Church Rd",
+     *             "adr_city": "Bixby",
+     *             "adr_postalcode": "74008",
+     *             "adr_region": "OK",
+     *             "adr_country": "USA"
+     *         }
+     *     ]
+     * 
+     */
+    @Processor
+    public InputStream carenetReadDemographics(String carenetId,
+                                                 @Optional @Default("application/rdf+xml") DemographicsResponseFormat responseFormat) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/demographics");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        r = r.queryParam("response_format", responseFormat.getDemographicsResponseFormat());
+        
+        InputStream response = r.get(InputStream.class);
+        
+        //TODO: Set response mimeType (see DEVKIT-133)
+        return response;       
+    }    
+
+    /**
+     * List documents from a given carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-document-list}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param type The Indivo document type to filter by
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return  document list on success
+     * Example Return Value:
+     * 
+     * <Documents record_id="123" total_document_count="3" pha="" >
+     *   <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *     <createdAt>2009-05-04T17:05:33</createdAt>
+     *     <creator id="steve@indivo.org" type="account">
+     *       <fullname>Steve Zabak</fullname>
+     *     </creator>
+     *     <suppressedAt>2009-05-06T17:05:33</suppressedAt>
+     *     <suppressor id="steve@indivo.org" type="account">
+     *       <fullname>Steve Zabak</fullname>
+     *     </suppressor>
+     *     <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *     <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *     <label>HBA1C reading</label>
+     *     <status>active</status>
+     *     <nevershare>false</nevershare>
+     *     <relatesTo>
+     *       <relation type="http://indivo.org/vocab/documentrels#attachment" count="1" />
+     *       <relation type="http://indivo.org/vocab/documentrels#annotation" count="5" />
+     *     </relatesTo>
+     *     <isRelatedFrom>
+     *       <relation type="http://indivo.org/vocab/documentrels#interpretation" count="1" />
+     *     </isRelatedFrom>
+     *   </Document>
+     * 
+     *   ...
+     * 
+     * </Documents>
+     */
+    @Processor
+    public InputStream carenetDocumentList(String carenetId,
+                                                 String type) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/documents/");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        r = r.queryParam("type", type);
+        
+        InputStream response = r.get(InputStream.class);
+        
+        return response;       
+    }    
+    
+    /**
+     * Return a document from a carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-document}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param documentId The unique identifier of the Indivo document
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return document content on success
+     * Example Return Value:
+     * 
+     * <ExampleDocument>
+     *   <content>That's my content</content>
+     *   <otherField attr="val" />
+     * </ExampleDocument>
+     */
+    @Processor
+    public InputStream carenetDocument(String carenetId,
+                                                 String documentId) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/documents/" + documentId);
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        InputStream response = r.get(InputStream.class);
+        
+        return response;       
+    }    
+    
+    /**
+     * Fetch the metadata of a record-specific document via a carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-document-meta}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param documentId The unique identifier of the Indivo document
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return document’s metadata
+     * Example Return Value:
+     * 
+     * <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *   <createdAt>2009-05-04T17:05:33</createdAt>
+     *   <creator id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </creator>
+     *   <suppressedAt>2009-05-06T17:05:33</suppressedAt>
+     *   <suppressor id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </suppressor>
+     *   <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *   <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *   <label>HBA1C reading</label>
+     *   <status>active</status>
+     *   <nevershare>false</nevershare>
+     *   <relatesTo>
+     *     <relation type="http://indivo.org/vocab/documentrels#attachment" count="1" />
+     *     <relation type="http://indivo.org/vocab/documentrels#annotation" count="5" />
+     *   </relatesTo>
+     *   <isRelatedFrom>
+     *     <relation type="http://indivo.org/vocab/documentrels#interpretation" count="1" />
+     *   </isRelatedFrom>
+     * </Document>
+     * 
+     */
+    @Processor
+    public InputStream carenetDocumentMeta(String carenetId,
+                                                 String documentId) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/documents/" + documentId + "/meta");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        InputStream response = r.get(InputStream.class);
+        
+        return response;       
+    }    
+    
+    /**
+     * Get basic information about the record to which a carenet belongs.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-record}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return XML describing the record.
+     * Example Return Value:
+     * 
+     * <Record id="123" label="Joe User">
+     *   <demographics document_id="467" />
+     *   <created at="2010-10-23T10:23:34Z" by="indivoconnector@apps.indivo.org" />
+     * </Record>
+     * 
+     */
+    @Processor
+    public InputStream carenetRecord(String carenetId) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/record");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        InputStream response = r.get(InputStream.class);
+        
+        return response;       
+    }        
+    
+    /**
+     * Change a carenet’s name.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-rename}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param carenetName The new name for the carenet.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return XML describing the renamed carenet on success
+     * Example Return Value:
+     * 
+     * <Carenets record_id="123">
+     *   <Carenet id="789" name="Work/School" mode="explicit" />
+     * </Carenets>
+     */
+    @Processor
+    public String carenetRename(String carenetId,
+                                       String carenetName) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/rename");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+
+        /*
+        Formdata Parameters:
+            
+        name – The new name for the carenet.
+        */
+
+        r = r.queryParam("name", carenetName);
+        
+        String response = r.post(String.class);
+        return response;       
+    }        
+
+    /**
+     * List the equipment data for a given carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-equipment-list}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param status The account or document status to filter by
+     * @param fieldName See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators), Valid Query Fields (http://indivo-x.readthedocs.org/en/latest/query-api.html#valid-query-fields)
+     * @param fieldValue See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators), Valid Query Fields (http://indivo-x.readthedocs.org/en/latest/query-api.html#valid-query-fields)
+     * @param dateGroup See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param groupBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param orderBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param aggregateBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param dateRange See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param limit See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param offset See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators) 
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return A list of equipment
+     * Example Return Value:
+     * 
+     * <Reports xmlns="http://indivo.org/vocab/xml/documents#">
+     *   <Summary total_document_count="2" limit="100" offset="0" order_by="date_measured" />
+     *   <QueryParams>
+     *     <DateRange value="date_measured*1995-03-10T00:00:00Z*" />
+     *     <Filters>
+     *       <Filter name="equipment_name" value="pacemaker"/>
+     *     </Filters>
+     *   </QueryParams>
+     *   <Report>
+     *     <Meta>
+     *       <Document id="261ca370-927f-41af-b001-7b615c7a468e" type="http://indivo.org/vocab/xml/documents#Models" size="1653" digest="0799971784e5a2d199cd6585415a8cd57f7bf9e4f8c8f74ef67a1009a1481cd6" record_id="">
+     *         <createdAt>2011-05-02T17:48:13Z</createdAt>
+     *         <creator id="mymail@mail.ma" type="Account">
+     *           <fullname>full name</fullname>
+     *         </creator>
+     *         <original id="261ca370-927f-41af-b001-7b615c7a468e"/>
+     *         <label>testing</label>
+     *         <status>active</status>
+     *         <nevershare>false</nevershare>
+     *       </Document>
+     *     </Meta>
+     *     <Item>
+     *       <Equipment xmlns="http://indivo.org/vocab/xml/documents#">
+     *         <dateStarted>2009-02-05</dateStarted>
+     *         <dateStopped>2010-06-12</dateStopped>
+     *         <type>cardiac</type>
+     *         <name>Pacemaker</name>
+     *         <vendor>Acme Medical Devices</vendor>
+     *         <id>167-ABC-23</id>
+     *         <description>it works</description>
+     *         <specification>blah blah blah</specification>
+     *       </Equipment>
+     *     </Item>
+     *   </Report>
+     * 
+     *   ...
+     * 
+     * </Reports>
+     */
+    @Processor
+    public InputStream carenetEquipmentList(String carenetId, 
+                                          @Optional String status,
+                                          @Optional String fieldName,
+                                          @Optional String fieldValue,                                          
+                                          @Optional String dateGroup,
+                                          @Optional String groupBy,
+                                          @Optional String orderBy,
+                                          @Optional String aggregateBy,
+                                          @Optional String dateRange,
+                                          @Optional String limit,
+                                          @Optional String offset) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/reports/minimal/equipment/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        /*
+        Query Parameters:
+
+        status – The account or document status to filter by
+        {FIELD} – See Query Operators, Valid Query Fields
+        date_group – See Query Operators
+        group_by – See Query Operators
+        order_by – See Query Operators
+        aggregate_by – See Query Operators
+        date_range – See Query Operators
+        limit – See Query Operators
+        offset – See Query Operators
+         */
+
+        if (!StringUtils.isEmpty(status))
+            r = r.queryParam("status", status);
+        if (!StringUtils.isEmpty(fieldName) && !StringUtils.isEmpty(fieldValue))
+            r = r.queryParam(fieldName, fieldValue);
+        if (!StringUtils.isEmpty(dateGroup))
+            r = r.queryParam("date_group", dateGroup);
+        if (!StringUtils.isEmpty(groupBy))
+            r = r.queryParam("group_by", groupBy);                
+        if (!StringUtils.isEmpty(orderBy))
+            r = r.queryParam("order_by", orderBy);
+        if (!StringUtils.isEmpty(aggregateBy))
+            r = r.queryParam("aggregate_by", aggregateBy);
+        if (!StringUtils.isEmpty(dateRange))
+            r = r.queryParam("date_range", dateRange);
+        if (!StringUtils.isEmpty(limit))
+            r = r.queryParam("limit", limit);
+        if (!StringUtils.isEmpty(offset))
+            r = r.queryParam("offset", offset);
+        
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+    
+    /**
+     * List the measurement data for a given carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-measurement-list}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param labCode The identifier corresponding to the measurement being made.
+     * @param status The account or document status to filter by
+     * @param fieldName See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators), Valid Query Fields (http://indivo-x.readthedocs.org/en/latest/query-api.html#valid-query-fields)
+     * @param fieldValue See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators), Valid Query Fields (http://indivo-x.readthedocs.org/en/latest/query-api.html#valid-query-fields)
+     * @param dateGroup See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param groupBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param orderBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param aggregateBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param dateRange See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param limit See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param offset See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators) 
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return A list of measurements
+     * Example Return Value:
+     * 
+     * <Reports xmlns="http://indivo.org/vocab/xml/documents#">
+     *   <Summary total_document_count="2" limit="100" offset="0" order_by="date_measured" />
+     *   <QueryParams>
+     *     <DateRange value="date_measured*1995-03-10T00:00:00Z*" />
+     *     <Filters>
+     *       <Filter name="lab_type" value="hematology"/>
+     *     </Filters>
+     *   </QueryParams>
+     *   <Report>
+     *     <Meta>
+     *       <Document id="261ca370-927f-41af-b001-7b615c7a468e" type="http://indivo.org/vocab/xml/documents#Measurement" size="1653" digest="0799971784e5a2d199cd6585415a8cd57f7bf9e4f8c8f74ef67a1009a1481cd6" record_id="">
+     *         <createdAt>2011-05-02T17:48:13Z</createdAt>
+     *         <creator id="mymail@mail.ma" type="Account">
+     *           <fullname>full name</fullname>
+     *         </creator>
+     *         <original id="261ca370-927f-41af-b001-7b615c7a468e"/>
+     *         <label>testing</label>
+     *         <status>active</status>
+     *         <nevershare>false</nevershare>
+     *       </Document>
+     *     </Meta>
+     *     <Item>
+     *       <Measurement id="1234" value="120" type="blood pressure systolic" datetime="2011-03-02T00:00:00Z" unit="mmHg" source_doc="3456" />
+     *     </Item>
+     *   </Report>
+     * 
+     *   ...
+     * 
+     * </Reports>
+     */
+    @Processor
+    public InputStream carenetMeasurementList(String carenetId, 
+                                          String labCode,
+                                          @Optional String status,
+                                          @Optional String fieldName,
+                                          @Optional String fieldValue,                                          
+                                          @Optional String dateGroup,
+                                          @Optional String groupBy,
+                                          @Optional String orderBy,
+                                          @Optional String aggregateBy,
+                                          @Optional String dateRange,
+                                          @Optional String limit,
+                                          @Optional String offset) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/reports/minimal/measurements/" + labCode + "/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        /*
+        Query Parameters:
+
+        status – The account or document status to filter by
+        {FIELD} – See Query Operators, Valid Query Fields
+        date_group – See Query Operators
+        group_by – See Query Operators
+        order_by – See Query Operators
+        aggregate_by – See Query Operators
+        date_range – See Query Operators
+        limit – See Query Operators
+        offset – See Query Operators
+         */
+
+        if (!StringUtils.isEmpty(status))
+            r = r.queryParam("status", status);
+        if (!StringUtils.isEmpty(fieldName) && !StringUtils.isEmpty(fieldValue))
+            r = r.queryParam(fieldName, fieldValue);
+        if (!StringUtils.isEmpty(dateGroup))
+            r = r.queryParam("date_group", dateGroup);
+        if (!StringUtils.isEmpty(groupBy))
+            r = r.queryParam("group_by", groupBy);                
+        if (!StringUtils.isEmpty(orderBy))
+            r = r.queryParam("order_by", orderBy);
+        if (!StringUtils.isEmpty(aggregateBy))
+            r = r.queryParam("aggregate_by", aggregateBy);
+        if (!StringUtils.isEmpty(dateRange))
+            r = r.queryParam("date_range", dateRange);
+        if (!StringUtils.isEmpty(limit))
+            r = r.queryParam("limit", limit);
+        if (!StringUtils.isEmpty(offset))
+            r = r.queryParam("offset", offset);
+        
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }    
+    
+    /**
+     * List the procedure data for a given carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-procedure-list}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param status The account or document status to filter by
+     * @param fieldName See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators), Valid Query Fields (http://indivo-x.readthedocs.org/en/latest/query-api.html#valid-query-fields)
+     * @param fieldValue See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators), Valid Query Fields (http://indivo-x.readthedocs.org/en/latest/query-api.html#valid-query-fields)
+     * @param dateGroup See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param groupBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param orderBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param aggregateBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param dateRange See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param limit See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param offset See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators) 
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return A list of procedures
+     * Example Return Value:
+     * 
+     * <Reports xmlns="http://indivo.org/vocab/xml/documents#">
+     *   <Summary total_document_count="2" limit="100" offset="0" order_by="date_measured" />
+     *   <QueryParams>
+     *     <DateRange value="date_measured*1995-03-10T00:00:00Z*" />
+     *     <Filters>
+     *     </Filters>
+     *   </QueryParams>
+     *   <Report>
+     *     <Meta>
+     *       <Document id="261ca370-927f-41af-b001-7b615c7a468e" type="http://indivo.org/vocab/xml/documents#Procedure" size="1653" digest="0799971784e5a2d199cd6585415a8cd57f7bf9e4f8c8f74ef67a1009a1481cd6" record_id="">
+     *         <createdAt>2011-05-02T17:48:13Z</createdAt>
+     *         <creator id="mymail@mail.ma" type="Account">
+     *           <fullname>full name</fullname>
+     *         </creator>
+     *         <original id="261ca370-927f-41af-b001-7b615c7a468e"/>
+     *         <label>testing</label>
+     *         <status>active</status>
+     *         <nevershare>false</nevershare>
+     *       </Document>
+     *     </Meta>
+     *     <Item>
+     *       <Procedure xmlns="http://indivo.org/vocab/xml/documents#">
+     *         <datePerformed>2009-05-16T12:00:00</datePerformed>
+     *         <name type="http://codes.indivo.org/procedures#" value="85" abbrev="append">Appendectomy</name>
+     *         <provider>
+     *           <name>Kenneth Mandl</name>
+     *           <institution>Children's Hospital Boston</institution>
+     *         </provider>
+     *       </Procedure>
+     *     </Item>
+     *   </Report>
+     * 
+     *   ...
+     * 
+     * </Reports>
+     */
+    @Processor
+    public InputStream carenetProcedureList(String carenetId, 
+                                          @Optional String status,
+                                          @Optional String fieldName,
+                                          @Optional String fieldValue,                                          
+                                          @Optional String dateGroup,
+                                          @Optional String groupBy,
+                                          @Optional String orderBy,
+                                          @Optional String aggregateBy,
+                                          @Optional String dateRange,
+                                          @Optional String limit,
+                                          @Optional String offset) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/reports/minimal/procedures/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        /*
+        Query Parameters:
+
+        status – The account or document status to filter by
+        {FIELD} – See Query Operators, Valid Query Fields
+        date_group – See Query Operators
+        group_by – See Query Operators
+        order_by – See Query Operators
+        aggregate_by – See Query Operators
+        date_range – See Query Operators
+        limit – See Query Operators
+        offset – See Query Operators
+         */
+
+        if (!StringUtils.isEmpty(status))
+            r = r.queryParam("status", status);
+        if (!StringUtils.isEmpty(fieldName) && !StringUtils.isEmpty(fieldValue))
+            r = r.queryParam(fieldName, fieldValue);
+        if (!StringUtils.isEmpty(dateGroup))
+            r = r.queryParam("date_group", dateGroup);
+        if (!StringUtils.isEmpty(groupBy))
+            r = r.queryParam("group_by", groupBy);                
+        if (!StringUtils.isEmpty(orderBy))
+            r = r.queryParam("order_by", orderBy);
+        if (!StringUtils.isEmpty(aggregateBy))
+            r = r.queryParam("aggregate_by", aggregateBy);
+        if (!StringUtils.isEmpty(dateRange))
+            r = r.queryParam("date_range", dateRange);
+        if (!StringUtils.isEmpty(limit))
+            r = r.queryParam("limit", limit);
+        if (!StringUtils.isEmpty(offset))
+            r = r.queryParam("offset", offset);
+        
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+    
+    /**
+     * List the simple_clinical_notes data for a given carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-simple-clinical-notes-list}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param status The account or document status to filter by
+     * @param fieldName See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators), Valid Query Fields (http://indivo-x.readthedocs.org/en/latest/query-api.html#valid-query-fields)
+     * @param fieldValue See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators), Valid Query Fields (http://indivo-x.readthedocs.org/en/latest/query-api.html#valid-query-fields)
+     * @param dateGroup See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param groupBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param orderBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param aggregateBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param dateRange See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param limit See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param offset See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators) 
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return A list of notes
+     * Example Return Value:
+     * 
+     * <Reports xmlns="http://indivo.org/vocab/xml/documents#">
+     *   <Summary total_document_count="2" limit="100" offset="0" order_by="date_measured" />
+     *   <QueryParams>
+     *     <DateRange value="date_measured*1995-03-10T00:00:00Z*" />
+     *     <Filters>
+     *     </Filters>
+     *   </QueryParams>
+     *   <Report>
+     *     <Meta>
+     *       <Document id="261ca370-927f-41af-b001-7b615c7a468e" type="http://indivo.org/vocab/xml/documents#SimpleClinicalNote" size="1653" digest="0799971784e5a2d199cd6585415a8cd57f7bf9e4f8c8f74ef67a1009a1481cd6" record_id="">
+     *         <createdAt>2011-05-02T17:48:13Z</createdAt>
+     *         <creator id="mymail@mail.ma" type="Account">
+     *           <fullname>full name</fullname>
+     *         </creator>
+     *         <original id="261ca370-927f-41af-b001-7b615c7a468e"/>
+     *         <label>testing</label>
+     *         <status>active</status>
+     *         <nevershare>false</nevershare>
+     *       </Document>
+     *     </Meta>
+     *     <Item>
+     *       <SimpleClinicalNote xmlns="http://indivo.org/vocab/xml/documents#">
+     *         <dateOfVisit>2010-02-02T12:00:00Z</dateOfVisit>
+     *         <finalizedAt>2010-02-03T13:12:00Z</finalizedAt>
+     *         <visitType type="http://codes.indivo.org/visit-types#" value="acute">Acute Care</visitType>
+     *         <visitLocation>Longfellow Medical</visitLocation>
+     *         <specialty type="http://codes.indivo.org/specialties#" value="hem-onc">Hematology/Oncology</specialty>
+     * 
+     *         <signature>
+     *           <at>2010-02-03T13:12:00Z</at>
+     *           <provider>
+     *             <name>Kenneth Mandl</name>
+     *             <institution>Children's Hospital Boston</institution>
+     *           </provider>
+     *         </signature>
+     * 
+     *         <signature>
+     *           <provider>
+     *             <name>Isaac Kohane</name>
+     *             <institution>Children's Hospital Boston</institution>
+     *           </provider>
+     *         </signature>
+     * 
+     *         <chiefComplaint>stomach ache</chiefComplaint>
+     *         <content>Patient presents with ... </content>
+     *       </SimpleClinicalNote>
+     *     </Item>
+     *   </Report>
+     * 
+     *   ...
+     * 
+     * </Reports>
+     */
+    @Processor
+    public InputStream carenetSimpleClinicalNotesList(String carenetId, 
+                                          @Optional String status,
+                                          @Optional String fieldName,
+                                          @Optional String fieldValue,                                          
+                                          @Optional String dateGroup,
+                                          @Optional String groupBy,
+                                          @Optional String orderBy,
+                                          @Optional String aggregateBy,
+                                          @Optional String dateRange,
+                                          @Optional String limit,
+                                          @Optional String offset) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/reports/minimal/simple-clinical-notes/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        /*
+        Query Parameters:
+
+        status – The account or document status to filter by
+        {FIELD} – See Query Operators, Valid Query Fields
+        date_group – See Query Operators
+        group_by – See Query Operators
+        order_by – See Query Operators
+        aggregate_by – See Query Operators
+        date_range – See Query Operators
+        limit – See Query Operators
+        offset – See Query Operators
+         */
+
+        if (!StringUtils.isEmpty(status))
+            r = r.queryParam("status", status);
+        if (!StringUtils.isEmpty(fieldName) && !StringUtils.isEmpty(fieldValue))
+            r = r.queryParam(fieldName, fieldValue);
+        if (!StringUtils.isEmpty(dateGroup))
+            r = r.queryParam("date_group", dateGroup);
+        if (!StringUtils.isEmpty(groupBy))
+            r = r.queryParam("group_by", groupBy);                
+        if (!StringUtils.isEmpty(orderBy))
+            r = r.queryParam("order_by", orderBy);
+        if (!StringUtils.isEmpty(aggregateBy))
+            r = r.queryParam("aggregate_by", aggregateBy);
+        if (!StringUtils.isEmpty(dateRange))
+            r = r.queryParam("date_range", dateRange);
+        if (!StringUtils.isEmpty(limit))
+            r = r.queryParam("limit", limit);
+        if (!StringUtils.isEmpty(offset))
+            r = r.queryParam("offset", offset);
+        
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+    
+    /**
+     * List the Model data for a given carenet.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:carenet-generic-list}
+     *
+     * 
+     * 
+     * @param carenetId The id string associated with the Indivo carenet
+     * @param dataModel The name of the data model to report on
+     * @param status The account or document status to filter by
+     * @param fieldName See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators), Valid Query Fields (http://indivo-x.readthedocs.org/en/latest/query-api.html#valid-query-fields)
+     * @param fieldValue See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators), Valid Query Fields (http://indivo-x.readthedocs.org/en/latest/query-api.html#valid-query-fields)
+     * @param dateGroup See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param groupBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param orderBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param aggregateBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param dateRange See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param limit See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param offset See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators) 
+     * @param responseFormat one of application/json (SDMJ), or application/xml (SDMX). Default is application/xml
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return list of DATA_MODELs
+     * Example Return Value:
+     * 
+     * SDMJ Example:
+     *    {
+     *     "__modelname__": "TestMedication",
+     *     "__documentid__": "b1d83191-6edd-4aad-be4e-63117cd4c660",
+     *     "name": "ibuprofen",
+     *     "date_started": "2010-10-01T00:00:00Z",
+     *     "date_stopped": "2010-10-31T00:00:00Z",
+     *     "brand_name": "Advil",
+     *     "prescription": {
+     *         "__modelname__": "TestPrescription",
+     *         "__documentid__": "b1d83191-6edd-4aad-be4e-63117cd4c660",
+     *         "prescribed_by_name": "Kenneth D. Mandl",
+     *         "prescribed_by_institution": "Children's Hospital Boston",
+     *         "prescribed_on": "2010-09-30T00:00:00Z",
+     *         "prescribed_stop_on": "2010-10-31T00:00:00Z"
+     *     },
+     *     "fills": [
+     *         {
+     *             "__modelname__": "TestFill",
+     *             "__documentid__": "b1d83191-6edd-4aad-be4e-63117cd4c660",
+     *             "date_filled": "2010-10-01T00:00:00Z",
+     *             "supply_days": "15",
+     *             "filled_at_name": "CVS"
+     *         },
+     *         {
+     *             "__modelname__": "TestFill",
+     *             "__documentid__": "b1d83191-6edd-4aad-be4e-63117cd4c660",
+     *             "date_filled": "2010-10-16T00:00:00Z",
+     *             "supply_days": "15",
+     *             "filled_at_name": "CVS"
+     *         }
+     *     ]
+     * }
+     * 
+     * SDMX Example:
+     * 
+     * <Models>
+     *   <Model name="TestMedication" documentId="b1d83191-6edd-4aad-be4e-63117cd4c660">
+     *     <Field name="date_started">2010-10-01T00:00:00Z</Field>
+     *     <Field name="name">ibuprofen</Field>
+     *     <Field name="brand_name">Advil</Field>
+     *     <Field name="date_stopped">2010-10-31T00:00:00Z</Field>
+     *     <Field name="prescription">
+     *       <Model name="TestPrescription"  documentId="b1d83191-6edd-4aad-be4e-63117cd4c660">
+     *         <Field name="prescribed_by_name">Kenneth D. Mandl</Field>
+     *         <Field name="prescribed_by_institution">Children's Hospital Boston</Field>
+     *         <Field name="prescribed_on">2010-09-30T00:00:00Z</Field>
+     *         <Field name="prescribed_stop_on">2010-10-31T00:00:00Z</Field>
+     *       </Model>
+     *     </Field>
+     *     <Field name="fills">
+     *       <Models>
+     *         <Model name="TestFill"  documentId="b1d83191-6edd-4aad-be4e-63117cd4c660">
+     *           <Field name="date_filled">2010-10-01T00:00:00Z</Field>
+     *           <Field name="supply_days">15</Field>
+     *           <Field name="filled_at_name">CVS</Field>
+     *         </Model>
+     *         <Model name="TestFill"  documentId="b1d83191-6edd-4aad-be4e-63117cd4c660">
+     *           <Field name="date_filled">2010-10-16T00:00:00Z</Field>
+     *           <Field name="supply_days">15</Field>
+     *           <Field name="filled_at_name">CVS</Field>
+     *         </Model>
+     *       </Models>
+     *     </Field>
+     *   </Model>
+     * </Models>
+     */
+    @Processor
+    public InputStream carenetGenericList(String carenetId,
+                                                 String dataModel, 
+                                                 @Optional String status,
+                                                 @Optional String fieldName,
+                                                 @Optional String fieldValue,                                          
+                                                 @Optional String dateGroup,
+                                                 @Optional String groupBy,
+                                                 @Optional String orderBy,
+                                                 @Optional String aggregateBy,
+                                                 @Optional String dateRange,
+                                                 @Optional String limit,
+                                                 @Optional String offset,
+                                                 @Optional @Default("application/xml") GenericResponseFormat responseFormat) throws Exception
+    {
+        final String apiUrl = getApiUrl("carenets/" + carenetId + "/reports/" + dataModel + "/");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        /*
+        Query Parameters:
+
+        status – The account or document status to filter by
+        {FIELD} – See Query Operators, Valid Query Fields
+        date_group – See Query Operators
+        group_by – See Query Operators
+        order_by – See Query Operators
+        aggregate_by – See Query Operators
+        date_range – See Query Operators
+        limit – See Query Operators
+        offset – See Query Operators
+         */
+
+        if (!StringUtils.isEmpty(status))
+            r = r.queryParam("status", status);
+        if (!StringUtils.isEmpty(fieldName) && !StringUtils.isEmpty(fieldValue))
+            r = r.queryParam(fieldName, fieldValue);
+        if (!StringUtils.isEmpty(dateGroup))
+            r = r.queryParam("date_group", dateGroup);
+        if (!StringUtils.isEmpty(groupBy))
+            r = r.queryParam("group_by", groupBy);                
+        if (!StringUtils.isEmpty(orderBy))
+            r = r.queryParam("order_by", orderBy);
+        if (!StringUtils.isEmpty(aggregateBy))
+            r = r.queryParam("aggregate_by", aggregateBy);
+        if (!StringUtils.isEmpty(dateRange))
+            r = r.queryParam("date_range", dateRange);
+        if (!StringUtils.isEmpty(limit))
+            r = r.queryParam("limit", limit);
+        if (!StringUtils.isEmpty(offset))
+            r = r.queryParam("offset", offset);
+        
+        r = r.queryParam("response_format", responseFormat.getGenericResponseFormat());
+        
+        InputStream response = r.get(InputStream.class);
+        
+        //TODO: Set response mimeType (see DEVKIT-133)
+        return response;       
+    }    
+    
+    /**
+     * Query a coding system for a value.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:coding-system-query}
+     *
+     * 
+     * 
+     * @param systemShortName short name
+     * @param query The query string to search for 
+     *  
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return JSON describing coding systems entries that matched query
+     * Example Return Value:
+     * [{"abbreviation": null, "code": "38341003", "consumer_value": null,
+     *   "umls_code": "C0020538",
+     *   "full_value": "Hypertensive disorder, systemic arterial (disorder)"},
+     *  {"abbreviation": null, "code": "55822004", "consumer_value": null,
+     *   "umls_code": "C0020473", "full_value": "Hyperlipidemia (disorder)"}]
+     */
+    @Processor
+    public JSONObject codingSystemQuery(String systemShortName,
+                                        String query) throws Exception
+    {
+        final String apiUrl = getApiUrl("codes/systems/" + systemShortName + "/query");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        r = r.queryParam("q", query);
+        
+        String response = r.get(String.class);
+        JSONObject jsonResponse = (JSONObject) JSONValue.parse(response);
+        return jsonResponse;
+    }
+
+    //======================== RECORDS ==============================================//-
+    /**
+     * Create a new record.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:record-create}
+     *
+     * 
+     * 
+     * @param document A valid Indivo Demographics Document 
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return information about the record on success
+     * Example Return Value:
+     * 
+     * <Record id="123" label="Joe Smith">
+     *   <demographics document_id="" />
+     * </Record>
+     */
+    @Processor
+    public String recordCreate(String document) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        
+        String response = r.post(String.class, document);
+        return response;       
+    }    
+    
+    /**
+     * Create a new record with an associated external id..
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:record-create-ext}
+     *
+     * 
+     * 
+     * @param principalEmail The email with which to scope an external id.
+     * @param externalId The external identifier of the desired resource
+     * @param document A valid Indivo Demographics Document 
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return information about the record on success
+     * Example Return Value:
+     * 
+     * <Record id="123" label="Joe Smith">
+     *   <demographics document_id="" />
+     * </Record>
+     */
+    @Processor
+    public String recordCreateExt(String principalEmail,
+                                    String externalId,
+                                    String document) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/external/" + principalEmail + "/" + externalId);
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        String response = r.put(String.class, document);
+        return response;       
+    }    
+
+    /**
+     * Search for records by label (usually the same as full name).
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:record-search}
+     *
+     * 
+     * 
+     * @param label A search string to match against record labels.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return list of matching records on success
+     * Example Return Value:
+     * 
+     * <Records>
+     *   <Record id="123" label="John R. Smith" />
+     *   <Record id = "234" label="Frank Frankson" />
+     * 
+     *   ...
+     * 
+     * </Records>
+     * 
+     */
+    @Processor
+    public InputStream recordSearch(String label) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/search");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        r = r.queryParam("label", label);
+        
+        InputStream response = r.get(InputStream.class);
+        
+        return response;       
+    }        
+    
+    /**
+     * Get information about an individual record.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:record}
+     *
+     * 
+     * 
+     * @param recordId The id string associated with the Indivo record
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return information about the record.
+     * Example Return Value:
+     * 
+     * <Record id="123" label="Joe Smith">
+     *   <demographics document_id="346" />
+     * </Record>
+     * 
+     */
+    @Processor
+    public InputStream record(String recordId) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/" + recordId);
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        InputStream response = r.get(InputStream.class);
+        
+        return response;       
+    }        
+
+    /**
+     * List userapps bound to a given record.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:record-phas}
+     *
+     * 
+     * 
+     * @param recordId The id string associated with the Indivo record
+     * @param type A namespaced document type. If specified, only apps which explicitly declare themselves as supporting that document type will be returned.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return list of JSON manifests for the userapps.
+     * Example Return Value:
+     * 
+     * [
+     * {
+     *     "name" : "SMART Problems",
+     *     "description" : "Display problems in a table view",
+     *     "author" : "Josh Mandel, Children's Hospital Boston",
+     *     "id" : "problem-list@apps.smartplatforms.org",
+     *     "version" : ".1a",
+     * 
+     *     "mode" : "ui",
+     *     "scope": "record",
+     * 
+     *     "index" : "http://fda.gping.org:8012/framework/problem_list/index.html",
+     *     "icon" : "http://fda.gping.org:8012/framework/problem_list/icon.png",
+     * 
+     *     "requires" : {
+     *         "http://smartplatforms.org/terms#Problem": {
+     *             "methods": ["GET"]
+     *         }
+     *     }
+     * },
+     * 
+     * ... other apps ...
+     * 
+     * ]
+     * 
+     */
+    @Processor
+    public JSONObject recordPhas(String recordId,
+                                                 @Optional String type) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/" + recordId + "/apps/");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        if (!StringUtils.isEmpty(type))
+            r = r.queryParam("type", type);
+        
+        String response = r.get(String.class);
+        JSONObject jsonResponse = (JSONObject) JSONValue.parse(response);
+        return jsonResponse;
+    }    
+   
+    /**
+     * Remove a userapp from a record.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:record-pha-delete}
+     *
+     * 
+     * 
+     * @param recordId The id string associated with the Indivo record
+     * @param phaId The email identifier of the Indivo user app
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String recordPhaDelete(String recordId,
+                                        String phaId) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/" + recordId + "/apps/" + phaId);
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.delete(String.class);
+        return response;
+    }
+    
+    /**
+     * Get information about a given userapp bound to a record.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:record-pha}
+     *
+     * 
+     * 
+     * @param recordId The id string associated with the Indivo record
+     * @param phaId The email identifier of the Indivo user app
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return JSON manifest for the app
+     * Example Return Value:
+     * 
+     * {
+     *     "name" : "SMART Problems",
+     *     "description" : "Display problems in a table view",
+     *     "author" : "Josh Mandel, Children's Hospital Boston",
+     *     "id" : "problem-list@apps.smartplatforms.org",
+     *     "version" : ".1a",
+     * 
+     *     "mode" : "ui",
+     *     "scope": "record",
+     * 
+     *     "index" : "http://fda.gping.org:8012/framework/problem_list/index.html",
+     *     "icon" : "http://fda.gping.org:8012/framework/problem_list/icon.png",
+     * 
+     *     "requires" : {
+     *         "http://smartplatforms.org/terms#Problem": {
+     *             "methods": ["GET"]
+     *         }
+     *     }
+     * }
+     */
+    @Processor
+    public JSONObject recordPha(String recordId,
+                                        String phaId) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/" + recordId + "/apps/" + phaId);
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.get(String.class);
+        JSONObject jsonResponse = (JSONObject) JSONValue.parse(response);
+        return jsonResponse;
+    }
+    
+    /**
+     * Enable a userapp for a record.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:record-pha-enable}
+     *
+     * 
+     * 
+     * @param recordId The id string associated with the Indivo record
+     * @param phaId The email identifier of the Indivo user app
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return <ok/> if successful
+     */
+    @Processor
+    public String recordPhaEnable(String recordId,
+                                        String phaId) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/" + recordId + "/apps/" + phaId);
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        String response = r.put(String.class);
+        return response;
+    }
+    
+    /**
+     * List record-app-specific documents.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:record-app-document-list}
+     *
+     * 
+     * 
+     * @param recordId The id string associated with the Indivo record
+     * @param phaId The email identifier of the Indivo user app
+     * @param status The account or document status to filter by
+     * @param orderBy See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param type The Indivo document type to filter by
+     * @param limit See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * @param offset See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return list of documents
+     * Example Return Value:
+     * <Documents record_id="123" total_document_count="4" pha="problems@apps.indivo.org">
+     *   <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *     <createdAt>2009-05-04T17:05:33</createdAt>
+     *     <creator id="steve@indivo.org" type="account">
+     *       <fullname>Steve Zabak</fullname>
+     *     </creator>
+     *     <suppressedAt>2009-05-06T17:05:33</suppressedAt>
+     *     <suppressor id="steve@indivo.org" type="account">
+     *       <fullname>Steve Zabak</fullname>
+     *     </suppressor>
+     *     <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *     <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *     <label>HBA1C reading Preferences</label>
+     *     <status>active</status>
+     *     <nevershare>false</nevershare>
+     *     <relatesTo>
+     *       <relation type="http://indivo.org/vocab/documentrels#attachment" count="1" />
+     *       <relation type="http://indivo.org/vocab/documentrels#annotation" count="5" />
+     *     </relatesTo>
+     *     <isRelatedFrom>
+     *       <relation type="http://indivo.org/vocab/documentrels#interpretation" count="1" />
+     *     </isRelatedFrom>
+     *   </Document>
+     * 
+     *   ...
+     * 
+     * </Documents>
+     */
+    @Processor
+    public InputStream recordAppDocumentList(String recordId,
+                                          String phaId,
+                                          @Optional String status,
+                                          @Optional String orderBy,
+                                          @Optional String type,
+                                          @Optional String limit,
+                                          @Optional String offset) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/" + recordId + "/apps/" + phaId + "/documents/");
+
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
+        
+        /*
+            Query Parameters:
+    
+            status – The account or document status to filter by
+            order_by – See Query Operators
+            type – The Indivo document type to filter by
+            limit – See Query Operators
+            offset – See Query Operators
+         */
+        if (!StringUtils.isEmpty(status))
+            r = r.queryParam("status", status);
+        if (!StringUtils.isEmpty(orderBy))
+            r = r.queryParam("order_by", orderBy);
+        if (!StringUtils.isEmpty(type))
+            r = r.queryParam("type", type);
+        if (!StringUtils.isEmpty(limit))
+            r = r.queryParam("limit", limit);
+        if (!StringUtils.isEmpty(offset))
+            r = r.queryParam("offset", offset);
+
+
+        InputStream response = r.get(InputStream.class);
+
+        return response;
+    }
+    
+    /**
+     * Create a record-app-specific Indivo document.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:record-app-document-create}
+     *
+     * 
+     * 
+     * @param recordId The id string associated with the Indivo record
+     * @param phaId The email identifier of the Indivo user app
+     * @param document The raw content of the document to create.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return metadata of the created document
+     * Example Return Value:
+     * 
+     * <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *   <createdAt>2009-05-04T17:05:33</createdAt>
+     *   <creator id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </creator>
+     *   <suppressedAt>2009-05-06T17:05:33</suppressedAt>
+     *   <suppressor id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </suppressor>
+     *   <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *   <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *   <label>HBA1C reading Preferences</label>
+     *   <status>active</status>
+     *   <nevershare>false</nevershare>
+     *   <relatesTo>
+     *     <relation type="http://indivo.org/vocab/documentrels#attachment" count="1" />
+     *     <relation type="http://indivo.org/vocab/documentrels#annotation" count="5" />
+     *   </relatesTo>
+     *   <isRelatedFrom>
+     *     <relation type="http://indivo.org/vocab/documentrels#interpretation" count="1" />
+     *   </isRelatedFrom>
+     * </Document>
+     */
+    @Processor
+    public String recordAppDocumentCreate(String recordId,
+                                    String phaId,
+                                    String document) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/" + recordId + "/apps/" + phaId + "/documents/");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        
+        String response = r.post(String.class, document);
+        return response;       
+    }    
+    
+    /**
+     * Create or Overwrite a record-app-specific Indivo document with an associated external id.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:record-app-document-create-or-update-ext}
+     *
+     * 
+     * 
+     * @param recordId The id string associated with the Indivo record
+     * @param externalId The external identifier of the desired resource
+     * @param phaId The email identifier of the Indivo user app
+     * @param document The raw content of the document to create/update.
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return metadata of the created document
+     * Example Return Value:
+     * 
+     * <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *   <createdAt>2009-05-04T17:05:33</createdAt>
+     *   <creator id="problems@apps.indivo.org" type="pha">
+     *   </creator>
+     *   <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *   <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *   <label>HBA1C reading preferences</label>
+     *   <status>active</status>
+     *   <nevershare>false</nevershare>
+     * </Document>
+     */
+    @Processor
+    public String recordAppDocumentCreateOrUpdateExt(String recordId,
+                                    String externalId,
+                                    String phaId,
+                                    String document) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/" + recordId + "/apps/" + phaId + "/documents/external/" + externalId);
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        r.accept(MediaType.APPLICATION_XML_TYPE).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        
+        String response = r.post(String.class, document);
+        return response;       
+    }    
+    
+    /**
+     * Create or Overwrite a record-app-specific Indivo document with an associated external id.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:record-app-document-meta-ext}
+     *
+     * 
+     * 
+     * @param recordId The id string associated with the Indivo record
+     * @param externalId The external identifier of the desired resource
+     * @param phaId The email identifier of the Indivo user app
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return metadata describing the specified document
+     * Example Return Value:
+     * 
+     * <Document id="14c81023-c84f-496d-8b8e-9438280441d3" type="" digest="7e9bc09276e0829374fd810f96ed98d544649703db3a9bc231550a0b0e5bcb1c" size="77">
+     *   <createdAt>2009-05-04T17:05:33</createdAt>
+     *   <creator id="problems@apps.indivo.org" type="pha">
+     *     <fullname>Steve Zabak</fullname>
+     *   </creator>
+     *   <suppressedAt>2009-05-06T17:05:33</suppressedAt>
+     *   <suppressor id="steve@indivo.org" type="account">
+     *     <fullname>Steve Zabak</fullname>
+     *   </suppressor>
+     *   <original id="14c81023-c84f-496d-8b8e-9438280441d3" />
+     *   <latest id="14c81023-c84f-496d-8b8e-9438280441d3" createdAt="2009-05-05T17:05:33" createdBy="steve@indivo.org" />
+     *   <label>HBA1C reading Preferences</label>
+     *   <status>active</status>
+     *   <nevershare>false</nevershare>
+     * </Document>
+     */
+    @Processor
+    public InputStream recordAppDocumentMetaExt(String recordId,
+                                    String externalId,
+                                    String phaId) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/" + recordId + "/apps/" + phaId + "/documents/external/" + externalId + "/meta");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        InputStream response = r.get(InputStream.class);
+        return response;       
+    }  
+    
+    //======================== SMART ==============================================//-
+    /**
+     * Fetch the SMART ontology as RDF/XML.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:smart-ontology}
+     *
+     * 
+     * 
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return An OWL file describing the SMART ontology.
+     * Example Return Value - see http://sandbox-api.smartplatforms.org/ontology
+     */
+    @Processor
+    public InputStream smartOntology() throws Exception
+    {
+        final String apiUrl = getApiUrl("ontology");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        InputStream response = r.get(InputStream.class);
+        
+        //TODO: Set response mimeType (see DEVKIT-133)
+        return response;       
+    }    
+    
+    /**
+     * SMART allergy list, serialized as RDF/XML.
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:smart-allergies}
+     *
+     * 
+     * 
+     * @param recordId The id string associated with the Indivo record
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return SMART RDF describing the record’s allergies and allergy exclusions
+     * Example Return Value:
+     * 
+     * <?xml version="1.0" encoding="UTF-8"?>
+     * <rdf:RDF
+     *    xmlns:dcterms="http://purl.org/dc/terms/"
+     *    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     *    xmlns:sp="http://smartplatforms.org/terms#">
+     *   <rdf:Description rdf:about="http://purl.bioontology.org/ontology/SNOMEDCT/271807003">
+     *     <dcterms:title>skin rash</dcterms:title>
+     *     <dcterms:identifier>271807003</dcterms:identifier>
+     *     <sp:system>http://purl.bioontology.org/ontology/SNOMEDCT/</sp:system>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms/codes/SNOMED"/>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:about="http://indivo.org/records/03059111-af61-4834-8234-befe5f5a2532/allergies/f8efc96a-7677-4b4f-9879-7fc6d6488d0b">
+     *     <sp:category rdf:nodeID="_865481f6-03ca-4707-8a89-ec468952efa5"/>
+     *     <sp:severity rdf:nodeID="_9f6a6981-1173-4041-8fa3-4462238ab8ae"/>
+     *     <sp:foodAllergen rdf:nodeID="_24be52e0-51a4-4d00-9654-25ae9e0ad2f4"/>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#Allergy"/>
+     *     <sp:belongsTo rdf:nodeID="_f63e49ae-5071-4f99-a62d-329a2e23ce85"/>
+     *     <sp:allergicReaction rdf:nodeID="_7912ae70-da78-443f-a0b6-3f955b9e140a"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:nodeID="_865481f6-03ca-4707-8a89-ec468952efa5">
+     *     <dcterms:title>food allergy</dcterms:title>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#CodedValue"/>
+     *     <sp:code rdf:resource="http://purl.bioontology.org/ontology/SNOMEDCT/414285001"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:nodeID="_e6301747-0618-4a74-9b52-d7b5f3745463">
+     *     <dcterms:title>drug allergy</dcterms:title>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#CodedValue"/>
+     *     <sp:code rdf:resource="http://purl.bioontology.org/ontology/SNOMEDCT/416098002"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:nodeID="_b8361d90-8b1e-40cb-b892-80dcb4301d90">
+     *     <dcterms:title>mild</dcterms:title>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#CodedValue"/>
+     *     <sp:code rdf:resource="http://purl.bioontology.org/ontology/SNOMEDCT/255604002"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:about="http://purl.bioontology.org/ontology/SNOMEDCT/414285001">
+     *     <dcterms:title>food allergy</dcterms:title>
+     *     <dcterms:identifier>414285001</dcterms:identifier>
+     *     <sp:system>http://purl.bioontology.org/ontology/SNOMEDCT/</sp:system>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms/codes/AllergyCategory"/>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:nodeID="_7912ae70-da78-443f-a0b6-3f955b9e140a">
+     *     <dcterms:title>anaphylaxis</dcterms:title>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#CodedValue"/>
+     *     <sp:code rdf:resource="http://purl.bioontology.org/ontology/SNOMEDCT/39579001"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:nodeID="_9f6a6981-1173-4041-8fa3-4462238ab8ae">
+     *     <dcterms:title>severe</dcterms:title>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#CodedValue"/>
+     *     <sp:code rdf:resource="http://purl.bioontology.org/ontology/SNOMEDCT/24484000"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:about="http://purl.bioontology.org/ontology/SNOMEDCT/416098002">
+     *     <dcterms:title>drug allergy</dcterms:title>
+     *     <dcterms:identifier>416098002</dcterms:identifier>
+     *     <sp:system>http://purl.bioontology.org/ontology/SNOMEDCT/</sp:system>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms/codes/AllergyCategory"/>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:nodeID="_2c0973ad-d7fd-4e7f-a6c2-5c625a54aea7">
+     *     <dcterms:title>skin rash</dcterms:title>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#CodedValue"/>
+     *     <sp:code rdf:resource="http://purl.bioontology.org/ontology/SNOMEDCT/271807003"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:about="http://indivo.org/records/03059111-af61-4834-8234-befe5f5a2532/allergies/a4abf13b-ec73-4ae4-b0a2-9d71ab2ea368">
+     *     <sp:drugClassAllergen rdf:nodeID="_f06759ab-6668-4832-97da-0794d244d403"/>
+     *     <sp:category rdf:nodeID="_e6301747-0618-4a74-9b52-d7b5f3745463"/>
+     *     <sp:severity rdf:nodeID="_b8361d90-8b1e-40cb-b892-80dcb4301d90"/>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#Allergy"/>
+     *     <sp:belongsTo rdf:nodeID="_f63e49ae-5071-4f99-a62d-329a2e23ce85"/>
+     *     <sp:allergicReaction rdf:nodeID="_2c0973ad-d7fd-4e7f-a6c2-5c625a54aea7"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:about="http://purl.bioontology.org/ontology/SNOMEDCT/39579001">
+     *     <dcterms:title>anaphylaxis</dcterms:title>
+     *     <dcterms:identifier>39579001</dcterms:identifier>
+     *     <sp:system>http://purl.bioontology.org/ontology/SNOMEDCT/</sp:system>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms/codes/SNOMED"/>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:about="http://purl.bioontology.org/ontology/SNOMEDCT/255604002">
+     *     <dcterms:title>mild</dcterms:title>
+     *     <dcterms:identifier>255604002</dcterms:identifier>
+     *     <sp:system>http://purl.bioontology.org/ontology/SNOMEDCT/</sp:system>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms/codes/AllergySeverity"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:nodeID="_24be52e0-51a4-4d00-9654-25ae9e0ad2f4">
+     *     <dcterms:title>peanut</dcterms:title>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#CodedValue"/>
+     *     <sp:code rdf:resource="http://fda.gov/UNII/QE1QX6B99R"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:about="http://purl.bioontology.org/ontology/NDFRT/N0000175503">
+     *     <dcterms:title>sulfonamide antibacterial</dcterms:title>
+     *     <dcterms:identifier>N0000175503</dcterms:identifier>
+     *     <sp:system>http://purl.bioontology.org/ontology/NDFRT/</sp:system>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms/codes/NDFRT"/>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:nodeID="_f06759ab-6668-4832-97da-0794d244d403">
+     *     <dcterms:title>sulfonamide antibacterial</dcterms:title>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#CodedValue"/>
+     *     <sp:code rdf:resource="http://purl.bioontology.org/ontology/NDFRT/N0000175503"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:nodeID="_f63e49ae-5071-4f99-a62d-329a2e23ce85">
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#MedicalRecord"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:about="http://fda.gov/UNII/QE1QX6B99R">
+     *     <dcterms:title>peanut</dcterms:title>
+     *     <dcterms:identifier>QE1QX6B99R</dcterms:identifier>
+     *     <sp:system>http://fda.gov/UNII/</sp:system>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms/codes/UNII"/>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *   </rdf:Description>
+     *   <rdf:Description rdf:about="http://purl.bioontology.org/ontology/SNOMEDCT/24484000">
+     *     <dcterms:title>severe</dcterms:title>
+     *     <dcterms:identifier>24484000</dcterms:identifier>
+     *     <sp:system>http://purl.bioontology.org/ontology/SNOMEDCT/</sp:system>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *     <rdf:type rdf:resource="http://smartplatforms.org/terms/codes/AllergySeverity"/>
+     *   </rdf:Description>
+     * </rdf:RDF>
+     */
+    @Processor
+    public InputStream smartAllergies(String recordId) throws Exception
+    {
+        final String apiUrl = getApiUrl("ontology");
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        InputStream response = r.get(InputStream.class);
+        
+        //TODO: Set response mimeType (see DEVKIT-133)
+        return response;       
+    }    
+
+    /**
+     * Retrieve a specific instance of a SMART Allergy/AllergyExclusion
+     *
+     * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:smart-allergies-instance}
+     *
+     * 
+     * 
+     * @param recordId The id string associated with the Indivo record
+     * @param modelId The id of the Allergy/AllergyExclusion
+     * 
+     * @throws java.lang.Exception if not successful
+     * 
+     * @return SMART RDF describing the AllergyAllergyExclusion
+     * Example Return Value:
+     * 
+     * <?xml version="1.0" encoding="UTF-8"?>
+     * <rdf:RDF
+     * xmlns:dcterms="http://purl.org/dc/terms/"
+     * xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     * xmlns:sp="http://smartplatforms.org/terms#">
+     *     <rdf:Description rdf:nodeID="_9ea3b5f3-c0c4-40d7-a370-2ab475ea1d6e">
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms#CodedValue"/>
+     *         <sp:code rdf:resource="http://purl.bioontology.org/ontology/NDFRT/N0000175503"/>
+     *         <dcterms:title>Sulfonamide Antibacterial</dcterms:title>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:about="http://purl.bioontology.org/ontology/SNOMEDCT/416098002">
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms/codes/AllergyCategory"/>
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *         <dcterms:identifier>416098002</dcterms:identifier>
+     *         <dcterms:title>Drug allergy</dcterms:title>
+     *         <sp:system>http://purl.bioontology.org/ontology/SNOMEDCT/</sp:system>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:about="http://purl.bioontology.org/ontology/SNOMEDCT/24484000">
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms/codes/AllergySeverity"/>
+     *         <dcterms:identifier>24484000</dcterms:identifier>
+     *         <dcterms:title>Severe</dcterms:title>
+     *         <sp:system>http://purl.bioontology.org/ontology/SNOMEDCT/</sp:system>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:about="http://purl.bioontology.org/ontology/SNOMEDCT/39579001">
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms/codes/SNOMED"/>
+     *         <dcterms:identifier>39579001</dcterms:identifier>
+     *         <dcterms:title>Anaphylaxis</dcterms:title>
+     *         <sp:system>http://purl.bioontology.org/ontology/SNOMEDCT/</sp:system>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:about="http://indivo.org/records/b171cd33-00a6-4038-976d-b8380c276ba1/allergies/09eadb0d-9c58-4cac-aad5-c84c29caf5bd">
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms#Allergy"/>
+     *         <sp:allergicReaction rdf:nodeID="_6538190b-0659-4710-b083-fe3f0462242b"/>
+     *         <sp:category rdf:nodeID="_3572cdcd-7787-4801-b6b3-e153794ace84"/>
+     *         <sp:drugClassAllergen rdf:nodeID="_9ea3b5f3-c0c4-40d7-a370-2ab475ea1d6e"/>
+     *         <sp:severity rdf:nodeID="_e62b76fe-e33b-4d9f-9a2b-dc1221e3eb17"/>
+     *         <sp:belongsTo rdf:resource="http://indivo.org/records/b171cd33-00a6-4038-976d-b8380c276ba1"/>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:nodeID="_6538190b-0659-4710-b083-fe3f0462242b">
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms#CodedValue"/>
+     *         <sp:code rdf:resource="http://purl.bioontology.org/ontology/SNOMEDCT/39579001"/>
+     *         <dcterms:title>Anaphylaxis</dcterms:title>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:nodeID="_e62b76fe-e33b-4d9f-9a2b-dc1221e3eb17">
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms#CodedValue"/>
+     *         <sp:code rdf:resource="http://purl.bioontology.org/ontology/SNOMEDCT/24484000"/>
+     *         <dcterms:title>Severe</dcterms:title>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:nodeID="_3572cdcd-7787-4801-b6b3-e153794ace84">
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms#CodedValue"/>
+     *         <sp:code rdf:resource="http://purl.bioontology.org/ontology/SNOMEDCT/416098002"/>
+     *         <dcterms:title>Drug allergy</dcterms:title>
+     *     </rdf:Description>
+     *     <rdf:Description rdf:about="http://purl.bioontology.org/ontology/NDFRT/N0000175503">
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms#Code"/>
+     *         <rdf:type rdf:resource="http://smartplatforms.org/terms/codes/NDFRT"/>
+     *         <dcterms:identifier>N0000175503</dcterms:identifier>
+     *         <dcterms:title>Sulfonamide Antibacterial</dcterms:title>
+     *         <sp:system>http://purl.bioontology.org/ontology/NDFRT/</sp:system>
+     *     </rdf:Description>
+     * </rdf:RDF>
+     */
+    @Processor
+    public InputStream smartAllergiesInstance(String recordId,
+                                     String modelId) throws Exception
+    {
+        final String apiUrl = getApiUrl("records/" + recordId + "/allergies/" + modelId);
+        
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);    
+        
+        InputStream response = r.get(InputStream.class);
+        
+        //TODO: Set response mimeType (see DEVKIT-133)
+        return response;       
+    }    
+
     /**
      * SMART-compatible alias for the generic list view: returns data_models serialized as SMART RDF.
      *
      * {@sample.xml ../../../doc/Indivo-connector.xml.sample indivo:smart-generic}
      *
-     * @param accessToken accessToken
-     * @param accessTokenSecret access token secret
+     * 
+     * 
      * @param recordId The id string associated with the Indivo record
      * @param modelName The name of the SMART data_model to retrieve (i.e. problems). Options are defined by the SMART API.
+     * 
+     * @throws java.lang.Exception if not successful
      * 
      * @return SMART RDF/XML for all items matching MODEL_NAME belonging to the record.
      */
     @Processor
-    public InputStream smartGeneric(@OAuthAccessToken String accessToken,
-			                              @OAuthAccessTokenSecret String accessTokenSecret,
-			                              String recordId,
+    public InputStream smartGeneric(String recordId,
 			                              String modelName) throws Exception
     {
     	final String apiUrl = getApiUrl("records/" + recordId + "/" + modelName);
 
-        WebResource r = getClient().resource(apiUrl);
-
-        if (isDebug())
-        {
-            r.addFilter(new LoggingFilter());
-        }
-        r.addFilter(getOAuthClientFilter(accessToken, accessTokenSecret));
+        WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
 
         InputStream response = r.get(InputStream.class);
 
@@ -501,5 +4072,96 @@ public class IndivoModule
         );        
         
         return filter;
+    }
+    
+    protected WebResource getResource(String url, String accessToken, String accessTokenSecret) {
+    	WebResource r = getClient().resource(url);
+
+        if (isDebug())
+        {
+            r.addFilter(new LoggingFilter());
+        }
+        r.addFilter(getOAuthClientFilter(accessToken, accessTokenSecret));
+        
+        return r;
+    }
+
+    //===============================
+    public enum Severity {
+    	low ("low"), 
+    	medium ("medium"), 
+    	high ("high");
+    	
+    	private final String severity;
+    	
+    	Severity(String severity) {
+    	    this.severity = severity;
+    	}
+
+        public String getSeverity() {
+            return severity;
+        }
+    	
+    }
+    public enum BodyType {
+    	plaintext ("plaintext"), 
+    	markdown ("markdown");
+    	
+    	private final String bodyType;
+    	
+    	BodyType(String bodyType) {
+    	    this.bodyType = bodyType;
+    	}
+
+        public String getBodyType() {
+            return bodyType;
+        }
+    }
+    public enum DemographicsResponseFormat {
+        rdfxml ("application/rdf+xml"),
+        json ("application/json"),
+        xml ("application/xml");
+        
+        private final String demographicsResponseFormat;
+        
+        DemographicsResponseFormat(String demographicsResponseFormat) {
+            this.demographicsResponseFormat = demographicsResponseFormat;
+        }
+        
+        public String getDemographicsResponseFormat() {
+            return demographicsResponseFormat;
+        }
+    }
+    public enum GenericResponseFormat {
+        json ("application/json"),
+        xml ("application/xml");
+        
+        private final String genericResponseFormat;
+        
+        GenericResponseFormat(String genericResponseFormat) {
+            this.genericResponseFormat = genericResponseFormat;
+        }
+        
+        public String getGenericResponseFormat() {
+            return genericResponseFormat;
+        }
+    }
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+
+    public String getAccessTokenSecret() {
+        return accessTokenSecret;
+    }
+
+
+    public void setAccessTokenSecret(String accessTokenSecret) {
+        this.accessTokenSecret = accessTokenSecret;
     }
 }

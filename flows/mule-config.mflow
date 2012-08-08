@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="mule-config">
+    <global-unknown entity-id="d60ba22d-9f24-496c-89f2-05af2f418eb6">
+        <content>&lt;indivo:config xmlns:indivo=&quot;http://www.mulesoft.org/schema/mule/indivo&quot; myProperty=&quot;Some string&quot;/&gt;</content>
+    </global-unknown>
+    <flow SubFlow="false" name="testFlow">
+        <properties>
+            <property name="processingStrategy2"/>
+            <property name="processingStrategy"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane hadOnlyOneElement="false" entity-id="8d3e5908-e9d2-4025-b3fc-9fe44f4d8eaf">
+            <unknown entity-id="4edab6b8-907d-49c5-adec-7401c0f390a5">
+                <content>&lt;indivo:my-processor xmlns:indivo=&quot;http://www.mulesoft.org/schema/mule/indivo&quot; content=&quot;Another string&quot;/&gt;</content>
+            </unknown>
+        </lane>
+    </flow>
+</mule-configuration>
