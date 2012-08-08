@@ -30,11 +30,7 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.oauth.OAuth;
-import org.mule.api.annotations.oauth.OAuthAccessToken;
-import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
-import org.mule.api.annotations.oauth.OAuthConsumerKey;
-import org.mule.api.annotations.oauth.OAuthConsumerSecret;
+import org.mule.api.annotations.oauth.*;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.util.StringUtils;
@@ -58,6 +54,9 @@ import com.sun.jersey.oauth.signature.OAuthSecrets;
 @OAuth(requestTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/request_token",
        accessTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/access_token",
        authorizationUrl = "http://sandbox.indivohealth.org/oauth/authorize",
+       authorizationParameters = {
+               @OAuthAuthorizeParameter(name = "record_id", type = String.class)
+       },
        verifierRegex = "oauth_token=([^&]+)")
 public class IndivoModule
 {
@@ -1459,7 +1458,7 @@ public class IndivoModule
      */
     @Processor
     public String appDocumentCreate(String phaEmail,
-                                     Object document) throws Exception
+                                    Object document) throws Exception
     {
         final String apiUrl = getApiUrl("apps/" + phaEmail + "/documents/");
         
@@ -2152,7 +2151,7 @@ public class IndivoModule
      * 
      * 
      * @param carenetId The id string associated with the Indivo carenet
-     * @param responseFormat one of application/rdf+xml (SMART RDF/XML), application/json (SDMJ), or application/xml (SDMX). Default is application/rdf+xml
+     * @param responseFormat one of rdfxml (SMART RDF/XML), json (SDMJ), or xml (SDMX). Default is rdfxml
      * 
      * @throws java.lang.Exception if not successful
      * 
@@ -2276,7 +2275,7 @@ public class IndivoModule
      */
     @Processor
     public InputStream carenetReadDemographics(String carenetId,
-                                                 @Optional @Default("application/rdf+xml") DemographicsResponseFormat responseFormat) throws Exception
+                                                 @Optional @Default("rdfxml") DemographicsResponseFormat responseFormat) throws Exception
     {
         final String apiUrl = getApiUrl("carenets/" + carenetId + "/demographics");
         
@@ -3001,7 +3000,7 @@ public class IndivoModule
      * @param dateRange See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
      * @param limit See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators)
      * @param offset See Query Operators (http://docs.indivohealth.org/en/v2.0.0/query-api.html#query-operators) 
-     * @param responseFormat one of application/json (SDMJ), or application/xml (SDMX). Default is application/xml
+     * @param responseFormat one of json (SDMJ), or xml (SDMX). Default is xml
      * 
      * @throws java.lang.Exception if not successful
      * 
@@ -3088,7 +3087,7 @@ public class IndivoModule
                                                  @Optional String dateRange,
                                                  @Optional String limit,
                                                  @Optional String offset,
-                                                 @Optional @Default("application/xml") GenericResponseFormat responseFormat) throws Exception
+                                                 @Optional @Default("xml") GenericResponseFormat responseFormat) throws Exception
     {
         final String apiUrl = getApiUrl("carenets/" + carenetId + "/reports/" + dataModel + "/");
         

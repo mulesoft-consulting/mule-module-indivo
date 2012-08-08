@@ -31,11 +31,11 @@
 <!-- END_INCLUDE(indivo:account-authsystem-add) -->
 
 <!-- BEGIN_INCLUDE(indivo:account-password-change) -->
-    <indivo:account-password-change accountId="muley@mulesoft.com" userName="muley" oldPassword="foo" newPassword="bar"/>
+    <indivo:account-password-change accountId="muley@mulesoft.com" oldPassword="foo" newPassword="bar"/>
 <!-- END_INCLUDE(indivo:account-password-change) -->
 
 <!-- BEGIN_INCLUDE(indivo:account-password-set) -->
-    <indivo:account-password-set accountId="muley@mulesoft.com" userName="muley" password="foo"/>
+    <indivo:account-password-set accountId="muley@mulesoft.com" password="foo"/>
 <!-- END_INCLUDE(indivo:account-password-set) -->
 
 <!-- BEGIN_INCLUDE(indivo:account-username-set) -->
@@ -127,11 +127,11 @@
 <!-- END_INCLUDE(indivo:app-document-list) -->
 
 <!-- BEGIN_INCLUDE(indivo:app-document-create) -->
-    <indivo:app-document-create phaEmail="myApp@mulesoft.com" document="#[payload:]"/>
+    <indivo:app-document-create phaEmail="myApp@mulesoft.com" document-ref="#[payload]"/>
 <!-- END_INCLUDE(indivo:app-document-create) -->
 
 <!-- BEGIN_INCLUDE(indivo:app-document-create-or-update-ext) -->
-    <indivo:app-document-create-or-update-ext externalId="14c81023-c84f-496d-8b8e-9438280441d3" phaEmail="myApp@mulesoft.com" document="#[payload:]"/>
+    <indivo:app-document-create-or-update-ext externalId="14c81023-c84f-496d-8b8e-9438280441d3" phaEmail="myApp@mulesoft.com" document-ref="#[payload:]"/>
 <!-- END_INCLUDE(indivo:app-document-create-or-update-ext) -->
 
 <!-- BEGIN_INCLUDE(indivo:app-document-meta-ext) -->
@@ -147,11 +147,11 @@
 <!-- END_INCLUDE(indivo:app-specific-document) -->
 
 <!-- BEGIN_INCLUDE(indivo:app-document-create-or-update) -->
-    <indivo:app-document-create-or-update documentId="14c81023-c84f-496d-8b8e-9438280441d3" phaEmail="myApp@mulesoft.com" document="#[payload:]"/>
+    <indivo:app-document-create-or-update documentId="14c81023-c84f-496d-8b8e-9438280441d3" phaEmail="myApp@mulesoft.com" document-ref="#[payload:]"/>
 <!-- END_INCLUDE(indivo:app-document-create-or-update) -->
 
 <!-- BEGIN_INCLUDE(indivo:app-document-label) -->
-    <indivo:app-document-label documentId="14c81023-c84f-496d-8b8e-9438280441d3" phaEmail="myApp@mulesoft.com" label="RELABELED: New HBA1C reading"/>
+    <indivo:app-document-label documentId="14c81023-c84f-496d-8b8e-9438280441d3" phaEmail="myApp@mulesoft.com" label-ref="RELABELED: New HBA1C reading"/>
 <!-- END_INCLUDE(indivo:app-document-label) -->
 
 <!-- BEGIN_INCLUDE(indivo:app-document-meta) -->
@@ -203,7 +203,7 @@
 <!-- END_INCLUDE(indivo:carenet-apps-create) -->
 
 <!-- BEGIN_INCLUDE(indivo:carenet-read-demographics) -->
-    <indivo:carenet-read-demographics carenetId="123" responseFormat="application/json"/>
+    <indivo:carenet-read-demographics carenetId="123" responseFormat="json"/>
 <!-- END_INCLUDE(indivo:carenet-read-demographics) -->
 
 <!-- BEGIN_INCLUDE(indivo:carenet-document-list) -->
