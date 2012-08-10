@@ -1,0 +1,9 @@
+com.mulesoft.module.indivo
+com.mulesoft.module.indivo.adapters
+com.mulesoft.module.indivo.agents
+com.mulesoft.module.indivo.config
+com.mulesoft.module.indivo.oauth
+com.mulesoft.module.indivo.process
+com.mulesoft.module.indivo.processors
+com.mulesoft.module.indivo.transformers
+

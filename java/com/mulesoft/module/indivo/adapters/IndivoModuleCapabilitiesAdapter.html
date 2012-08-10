@@ -1,0 +1,2927 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+  <meta name="description" content="Documentation for Mule Cloud Connector for Indivo." />
+
+<link rel="shortcut icon" type="image/x-icon" href="../../../../../../favicon.ico" />
+<title>
+
+  IndivoModuleCapabilitiesAdapter
+
+
+| Mule Cloud Connector for Indivo
+
+</title>
+<link href="../../../../../../assets/mule-developer-docs.css" rel="stylesheet" type="text/css" />
+<link href="../../../../../../assets/mule-developer-prettify.css" rel="stylesheet" type="text/css" />
+<link href="../../../../../../assets/customizations.css" rel="stylesheet" type="text/css" />
+<link href='http://fonts.googleapis.com/css?family=Ubuntu:300' rel='stylesheet' type='text/css'>
+<script src="../../../../../../assets/search_autocomplete.js" type="text/javascript"></script>
+<script src="../../../../../../assets/jquery-resizable.min.js" type="text/javascript"></script>
+<script src="../../../../../../assets/jquery-toc.js" type="text/javascript"></script>
+<script src="../../../../../../assets/mule-developer-docs.js" type="text/javascript"></script>
+<script src="../../../../../../assets/prettify.js" type="text/javascript"></script>
+<script type="text/javascript">
+  setToRoot("../../../../../../", "../../../../../../assets/");
+</script>
+<script src="../../../../../../assets/mule-developer-reference.js" type="text/javascript"></script>
+<script src="../../../../../../assets/navtree_data.js" type="text/javascript"></script>
+<script src="../../../../../../assets/customizations.js" type="text/javascript"></script>
+<noscript>
+  <style type="text/css">
+    html,body{overflow:auto;}
+    #body-content{position:relative; top:0;}
+    #doc-content{overflow:visible;border-left:3px solid #666;}
+    #side-nav{padding:0;}
+    #side-nav .toggle-list ul {display:block;}
+    #resize-packages-nav{border-bottom:3px solid #666;}
+  </style>
+</noscript>
+<script type="text/javascript" charset="utf-8">
+  var is_ssl = ("https:" == document.location.protocol);
+  var asset_host = is_ssl ? "https://s3.amazonaws.com/getsatisfaction.com/" : "http://s3.amazonaws.com/getsatisfaction.com/";
+  document.write(unescape("%3Cscript src='" + asset_host + "javascripts/feedback-v2.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+<script type="text/javascript" charset="utf-8">
+  var feedback_widget_options = {};
+
+  feedback_widget_options.display = "overlay";
+  feedback_widget_options.company = "mulesoft";
+  feedback_widget_options.placement = "right";
+  feedback_widget_options.color = "#2F74AE";
+  feedback_widget_options.style = "question";
+
+  feedback_widget_options.tag = "Mule Cloud Connector for Indivo";
+
+  feedback_widget_options.limit = "3";
+
+  var feedback_widget = new GSFN.feedback_widget(feedback_widget_options);
+</script>
+</head>
+
+<body class="">
+
+<div id="header">
+    <div id="headerLeft">
+    
+      <span id="masthead-title">Mule Cloud Connector for Indivo</span>
+    
+    <ul id="header-tabs" class="">
+    
+    	<li id="guide"><a href="../../../../../../guide/install.html">
+	    	<span class="en">Install Guide</span>
+    	</a></li>
+    
+    	<li id="java"><a href="../../../../../../java/packages.html">
+	    	<span class="en">Java API Reference</span>
+    	</a></li>
+    
+    	<li id="mule"><a href="../../../../../../mule/modules.html">
+	    	<span class="en">Mule API Reference</span>
+    	</a></li>
+    
+    </ul>
+    </div>
+    <div id="headerRight">
+      <a href="http://www.mulesoft.com" tabindex="-1">
+      <img src="../../../../../../assets//images/mulesoft-logo-final.gif" alt="MuleSoft" border="0" id="mulesoftlogo"></a><br/>
+      
+  <div id="search" >
+      <div id="searchForm">
+          <form accept-charset="utf-8" class="gsc-search-box" 
+                onsubmit="return submit_search()">
+            <table class="gsc-search-box" cellpadding="0" cellspacing="0"><tbody>
+                <tr>
+                  <td class="gsc-input">
+                    <input id="search_autocomplete" class="gsc-input" type="text" size="33" autocomplete="off"
+                      title="search developer docs" name="q"
+                      value="search developer docs"
+                      onFocus="search_focus_changed(this, true)"
+                      onBlur="search_focus_changed(this, false)"
+                      onkeydown="return search_changed(event, true, '../../../../../../')"
+                      onkeyup="return search_changed(event, false, '../../../../../../')" />
+                  <div id="search_filtered_div" class="no-display">
+                      <table id="search_filtered" cellspacing=0>
+                      </table>
+                  </div>
+                  </td>
+                  <td class="gsc-search-button">
+                    <input type="submit" value="Search" title="search" id="search-button" class="gsc-search-button" />
+                  </td>
+                  <td class="gsc-clear-button">
+                    <div title="clear results" class="gsc-clear-button">&nbsp;</div>
+                  </td>
+                </tr></tbody>
+              </table>
+          </form>
+      </div><!-- searchForm -->
+  </div><!-- search -->
+      
+    </div>
+</div><!-- header -->
+
+
+  <div class="g-section g-tpl-240" id="body-content">
+    <div class="g-unit g-first side-nav-resizable" id="side-nav">
+      <div id="swapper">
+        <div id="nav-panels">
+          <div id="resize-packages-nav">
+            <div id="packages-nav">
+              <div id="index-links">
+                <a href="../../../../../../java/packages.html"  >Package Index</a> |
+                <a href="../../../../../../java/classes.html" >Class Index</a>
+              </div>
+              <ul>
+                
+    <li class="api apilevel-">
+  <a href="../../../../../../java/com/mulesoft/module/indivo/package-summary.html">com.mulesoft.module.indivo</a></li>
+    <li class="selected api apilevel-">
+  <a href="../../../../../../java/com/mulesoft/module/indivo/adapters/package-summary.html">com.mulesoft.module.indivo.adapters</a></li>
+    <li class="api apilevel-">
+  <a href="../../../../../../java/com/mulesoft/module/indivo/agents/package-summary.html">com.mulesoft.module.indivo.agents</a></li>
+    <li class="api apilevel-">
+  <a href="../../../../../../java/com/mulesoft/module/indivo/config/package-summary.html">com.mulesoft.module.indivo.config</a></li>
+    <li class="api apilevel-">
+  <a href="../../../../../../java/com/mulesoft/module/indivo/oauth/package-summary.html">com.mulesoft.module.indivo.oauth</a></li>
+    <li class="api apilevel-">
+  <a href="../../../../../../java/com/mulesoft/module/indivo/process/package-summary.html">com.mulesoft.module.indivo.process</a></li>
+    <li class="api apilevel-">
+  <a href="../../../../../../java/com/mulesoft/module/indivo/processors/package-summary.html">com.mulesoft.module.indivo.processors</a></li>
+    <li class="api apilevel-">
+  <a href="../../../../../../java/com/mulesoft/module/indivo/transformers/package-summary.html">com.mulesoft.module.indivo.transformers</a></li>
+              </ul><br/>
+            </div> <!-- end packages -->
+          </div> <!-- end resize-packages -->
+          <div id="classes-nav">
+            <ul>
+              
+              
+    <li><h2>Classes</h2>
+      <ul>
+          <li class="selected api apilevel-"><a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleCapabilitiesAdapter.html">IndivoModuleCapabilitiesAdapter</a></li>
+          <li class="api apilevel-"><a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleHttpCallbackAdapter.html">IndivoModuleHttpCallbackAdapter</a></li>
+          <li class="api apilevel-"><a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleLifecycleAdapter.html">IndivoModuleLifecycleAdapter</a></li>
+          <li class="api apilevel-"><a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleMetadataAdapater.html">IndivoModuleMetadataAdapater</a></li>
+          <li class="api apilevel-"><a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleOAuth1Adapter.html">IndivoModuleOAuth1Adapter</a></li>
+          <li class="api apilevel-"><a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleProcessAdapter.html">IndivoModuleProcessAdapter</a></li>
+      </ul>
+    </li>
+              
+              
+              
+              
+            </ul><br/>
+          </div><!-- end classes -->
+        </div><!-- end nav-panels -->
+        <div id="nav-tree" style="display:none">
+          <div id="index-links">
+            <a href="../../../../../../packages.html"  >Package Index</a> | 
+            <a href="../../../../../../classes.html" >Class Index</a>
+          </div>
+        </div><!-- end nav-tree -->
+      </div><!-- end swapper -->
+    </div> <!-- end side-nav -->
+    <script>
+      if (!isMobile) {
+        $("<a href='#' id='nav-swap' onclick='swapNav();return false;' style='font-size:10px;line-height:9px;margin-left:1em;text-decoration:none;'><span id='tree-link'>Use Tree Navigation</span><span id='panel-link' style='display:none'>Use Panel Navigation</span></a>").appendTo("#side-nav");
+        chooseDefaultNav();
+        if ($("#nav-tree").is(':visible')) {
+          init_default_navtree("../../../../../../");
+        } else {
+          addLoadEvent(function() {
+            scrollIntoView("packages-nav");
+            scrollIntoView("classes-nav");
+          });
+        }
+        $("#swapper").css({borderBottom:"2px solid #aaa"});
+      } else {
+        swapNav(); // tree view should be used on mobile
+      }
+    </script>
+
+
+
+<div class="g-unit" id="doc-content">
+
+<div id="api-info-block">
+
+
+
+  
+   
+  
+  
+  
+   
+  
+  
+
+  
+   
+  
+  
+  
+  
+
+  
+   
+  
+  
+  
+  
+
+
+<div class="sum-details-links">
+
+
+Summary:
+
+
+
+
+
+
+
+
+  <a href="#inhfields">Inherited Fields</a>
+  
+
+
+  &#124; <a href="#pubctors">Ctors</a>
+  
+
+
+
+  &#124; <a href="#pubmethods">Methods</a>
+  
+
+
+
+  &#124; <a href="#inhmethods">Inherited Methods</a>
+
+&#124; <a href="#" onclick="return toggleAllClassInherited()" id="toggleAllClassInherited">[Expand All]</a>
+
+</div><!-- end sum-details-links -->
+<div class="api-level">
+  
+
+
+  
+  
+
+</div>
+</div><!-- end api-info-block -->
+
+
+<!-- ======== START OF CLASS DATA ======== -->
+
+<div id="jd-header">
+    public
+     
+     
+    
+    class
+<h1>IndivoModuleCapabilitiesAdapter</h1>
+
+
+
+  
+  
+  
+
+  
+    extends <a href="../../../../../../java/com/mulesoft/module/indivo/IndivoModule.html">IndivoModule</a><br/>
+  
+  
+  
+
+  
+  
+      implements 
+      
+        Capabilities 
+      
+  
+  
+
+
+</div><!-- end header -->
+
+<div id="naMessage"></div>
+
+<div id="jd-content" class="api apilevel-">
+<table class="jd-inheritance-table">
+
+
+    <tr>
+        
+        <td colspan="3" class="jd-inheritance-class-cell"><a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/Object.html">java.lang.Object</a></td>
+    </tr>
+    
+
+    <tr>
+        
+            <td class="jd-inheritance-space">&nbsp;&nbsp;&nbsp;&#x21b3;</td>
+        
+        <td colspan="2" class="jd-inheritance-class-cell"><a href="../../../../../../java/com/mulesoft/module/indivo/IndivoModule.html">com.mulesoft.module.indivo.IndivoModule</a></td>
+    </tr>
+    
+
+    <tr>
+        
+            <td class="jd-inheritance-space">&nbsp;</td>
+        
+            <td class="jd-inheritance-space">&nbsp;&nbsp;&nbsp;&#x21b3;</td>
+        
+        <td colspan="1" class="jd-inheritance-class-cell">com.mulesoft.module.indivo.adapters.IndivoModuleCapabilitiesAdapter</td>
+    </tr>
+    
+
+</table>
+
+
+
+
+<table class="jd-sumtable jd-sumtable-subclasses"><tr><td colspan="12" style="border:none;margin:0;padding:0;">
+
+  <a href="#" onclick="return toggleInherited(this, null)" id="subclasses-direct" class="jd-expando-trigger closed"
+          ><img id="subclasses-direct-trigger"
+          src="../../../../../../assets/images/triangle-closed.png"
+          class="jd-expando-trigger-img" /></a>Known Direct Subclasses
+
+  <div id="subclasses-direct">
+      <div id="subclasses-direct-list"
+              class="jd-inheritedlinks"
+              
+              >
+          
+            
+              <a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleMetadataAdapater.html">IndivoModuleMetadataAdapater</a>
+            
+          
+      </div>
+      <div id="subclasses-direct-summary"
+              style="display: none;"
+              >
+  <table class="jd-sumtable-expando">
+        <tr class="alt-color api apilevel-" >
+              <td class="jd-linkcol"><a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleMetadataAdapater.html">IndivoModuleMetadataAdapater</a></td>
+              <td class="jd-descrcol" width="100%">A <code>IndivoModuleMetadataAdapater</code> is a wrapper around <code><a href="../../../../../../java/com/mulesoft/module/indivo/IndivoModule.html">IndivoModule</a></code> that adds support for querying metadata about the extension.&nbsp;</td>
+          </tr>
+  </table>
+      </div>
+  </div>
+</td></tr></table>
+
+
+
+<table class="jd-sumtable jd-sumtable-subclasses"><tr><td colspan="12" style="border:none;margin:0;padding:0;">
+
+  <a href="#" onclick="return toggleInherited(this, null)" id="subclasses-indirect" class="jd-expando-trigger closed"
+          ><img id="subclasses-indirect-trigger"
+          src="../../../../../../assets/images/triangle-closed.png"
+          class="jd-expando-trigger-img" /></a>Known Indirect Subclasses
+
+  <div id="subclasses-indirect">
+      <div id="subclasses-indirect-list"
+              class="jd-inheritedlinks"
+              
+              >
+          
+            
+              <a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleHttpCallbackAdapter.html">IndivoModuleHttpCallbackAdapter</a>,
+            
+              <a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleLifecycleAdapter.html">IndivoModuleLifecycleAdapter</a>,
+            
+              <a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleOAuth1Adapter.html">IndivoModuleOAuth1Adapter</a>,
+            
+              <a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleProcessAdapter.html">IndivoModuleProcessAdapter</a>
+            
+          
+      </div>
+      <div id="subclasses-indirect-summary"
+              style="display: none;"
+              >
+  <table class="jd-sumtable-expando">
+        <tr class="alt-color api apilevel-" >
+              <td class="jd-linkcol"><a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleHttpCallbackAdapter.html">IndivoModuleHttpCallbackAdapter</a></td>
+              <td class="jd-descrcol" width="100%">&nbsp;</td>
+          </tr>
+        <tr class=" api apilevel-" >
+              <td class="jd-linkcol"><a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleLifecycleAdapter.html">IndivoModuleLifecycleAdapter</a></td>
+              <td class="jd-descrcol" width="100%">A <code>IndivoModuleLifecycleAdapter</code> is a wrapper around <code><a href="../../../../../../java/com/mulesoft/module/indivo/IndivoModule.html">IndivoModule</a></code> that adds lifecycle methods to the pojo.&nbsp;</td>
+          </tr>
+        <tr class="alt-color api apilevel-" >
+              <td class="jd-linkcol"><a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleOAuth1Adapter.html">IndivoModuleOAuth1Adapter</a></td>
+              <td class="jd-descrcol" width="100%">A <code>IndivoModuleOAuth1Adapter</code> is a wrapper around <code><a href="../../../../../../java/com/mulesoft/module/indivo/IndivoModule.html">IndivoModule</a></code> that adds OAuth capabilites to the pojo.&nbsp;</td>
+          </tr>
+        <tr class=" api apilevel-" >
+              <td class="jd-linkcol"><a href="../../../../../../java/com/mulesoft/module/indivo/adapters/IndivoModuleProcessAdapter.html">IndivoModuleProcessAdapter</a></td>
+              <td class="jd-descrcol" width="100%">A <code>IndivoModuleProcessAdapter</code> is a wrapper around <code><a href="../../../../../../java/com/mulesoft/module/indivo/IndivoModule.html">IndivoModule</a></code> that enables custom processing strategies.&nbsp;</td>
+          </tr>
+  </table>
+      </div>
+  </div>
+</td></tr></table>
+
+
+<div class="jd-descr">
+
+
+<h2>Class Overview</h2>
+<p>A <code>IndivoModuleCapabilitiesAdapter</code> is a wrapper around <code><a href="../../../../../../java/com/mulesoft/module/indivo/IndivoModule.html">IndivoModule</a></code> that implements org.mule.api.Capabilities interface.
+ 
+</p>
+
+
+
+
+
+</div><!-- jd-descr -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="jd-descr">
+
+
+<h2>Summary</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- =========== FIELD SUMMARY =========== -->
+<table id="inhfields" class="jd-sumtable"><tr><th>
+  <a href="#" class="toggle-all" onclick="return toggleAllInherited(this, null)">[Expand]</a>
+  <div style="clear:left;">Inherited Fields</div></th></tr>
+
+
+<tr class="api apilevel-" >
+<td colspan="12">
+
+  <a href="#" onclick="return toggleInherited(this, null)" id="inherited-fields-com.mulesoft.module.indivo.IndivoModule" class="jd-expando-trigger closed"
+          ><img id="inherited-fields-com.mulesoft.module.indivo.IndivoModule-trigger"
+          src="../../../../../../assets/images/triangle-closed.png"
+          class="jd-expando-trigger-img" /></a>From class
+<a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html">com.mulesoft.module.indivo.IndivoModule</a>
+<div id="inherited-fields-com.mulesoft.module.indivo.IndivoModule">
+  <div id="inherited-fields-com.mulesoft.module.indivo.IndivoModule-list"
+        class="jd-inheritedlinks">
+  </div>
+  <div id="inherited-fields-com.mulesoft.module.indivo.IndivoModule-summary" style="display: none;">
+    <table class="jd-sumtable-expando">
+    
+
+    
+      <tr class="alt-color api apilevel-" >
+          <td class="jd-typecol"><nobr>
+          private
+          
+          
+          <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr></td>
+          <td class="jd-linkcol"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accessToken">accessToken</a></td>
+          <td class="jd-descrcol" width="100%"></td>
+      </tr>
+      
+    
+      <tr class=" api apilevel-" >
+          <td class="jd-typecol"><nobr>
+          private
+          
+          
+          <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr></td>
+          <td class="jd-linkcol"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accessTokenSecret">accessTokenSecret</a></td>
+          <td class="jd-descrcol" width="100%"></td>
+      </tr>
+      
+    
+      <tr class="alt-color api apilevel-" >
+          <td class="jd-typecol"><nobr>
+          private
+          
+          
+          <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr></td>
+          <td class="jd-linkcol"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appKey">appKey</a></td>
+          <td class="jd-descrcol" width="100%">Application key
+</td>
+      </tr>
+      
+    
+      <tr class=" api apilevel-" >
+          <td class="jd-typecol"><nobr>
+          private
+          
+          
+          <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr></td>
+          <td class="jd-linkcol"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appSecret">appSecret</a></td>
+          <td class="jd-descrcol" width="100%">Application secret
+</td>
+      </tr>
+      
+    
+      <tr class="alt-color api apilevel-" >
+          <td class="jd-typecol"><nobr>
+          private
+          
+          
+          Client</nobr></td>
+          <td class="jd-linkcol"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#client">client</a></td>
+          <td class="jd-descrcol" width="100%"></td>
+      </tr>
+      
+    
+      <tr class=" api apilevel-" >
+          <td class="jd-typecol"><nobr>
+          private
+          
+          
+          boolean</nobr></td>
+          <td class="jd-linkcol"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#debug">debug</a></td>
+          <td class="jd-descrcol" width="100%">debug mode
+</td>
+      </tr>
+      
+    
+      <tr class="alt-color api apilevel-" >
+          <td class="jd-typecol"><nobr>
+          private
+          
+          
+          int</nobr></td>
+          <td class="jd-linkcol"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#port">port</a></td>
+          <td class="jd-descrcol" width="100%">Indivo server port 
+</td>
+      </tr>
+      
+    
+      <tr class=" api apilevel-" >
+          <td class="jd-typecol"><nobr>
+          private
+          
+          
+          <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr></td>
+          <td class="jd-linkcol"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#protocol">protocol</a></td>
+          <td class="jd-descrcol" width="100%">Indivo server protocol 
+</td>
+      </tr>
+      
+    
+      <tr class="alt-color api apilevel-" >
+          <td class="jd-typecol"><nobr>
+          private
+          
+          
+          <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr></td>
+          <td class="jd-linkcol"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#server">server</a></td>
+          <td class="jd-descrcol" width="100%">URL of the Indivo server API
+</td>
+      </tr>
+      
+    
+</table>
+  </div>
+</div>
+</td></tr>
+
+
+
+
+
+
+</table>
+
+
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<table id="pubctors" class="jd-sumtable"><tr><th colspan="12">Public Constructors</th></tr>
+
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            </nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/adapters/IndivoModuleCapabilitiesAdapter.html#IndivoModuleCapabilitiesAdapter()">IndivoModuleCapabilitiesAdapter</a></span>()</nobr>
+        
+  </td></tr>
+
+
+
+</table>
+
+
+
+
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+<table id="pubmethods" class="jd-sumtable"><tr><th colspan="12">Public Methods</th></tr>
+
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            boolean</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/adapters/IndivoModuleCapabilitiesAdapter.html#isCapableOf(org.mule.api.Capability)">isCapableOf</a></span>(Capability capability)</nobr>
+        
+        <div class="jd-descrdiv">Returns true if this module implements such capability
+ 
+</div>
+  
+  </td></tr>
+
+
+
+</table>
+
+
+
+
+
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+<table id="inhmethods" class="jd-sumtable"><tr><th>
+  <a href="#" class="toggle-all" onclick="return toggleAllInherited(this, null)">[Expand]</a>
+  <div style="clear:left;">Inherited Methods</div></th></tr>
+
+
+<tr class="api apilevel-" >
+<td colspan="12">
+  <a href="#" onclick="return toggleInherited(this, null)" id="inherited-methods-com.mulesoft.module.indivo.IndivoModule" class="jd-expando-trigger closed"
+          ><img id="inherited-methods-com.mulesoft.module.indivo.IndivoModule-trigger"
+          src="../../../../../../assets/images/triangle-closed.png"
+          class="jd-expando-trigger-img" /></a>
+From class
+
+  <a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html">com.mulesoft.module.indivo.IndivoModule</a>
+
+<div id="inherited-methods-com.mulesoft.module.indivo.IndivoModule">
+  <div id="inherited-methods-com.mulesoft.module.indivo.IndivoModule-list"
+        class="jd-inheritedlinks">
+  </div>
+  <div id="inherited-methods-com.mulesoft.module.indivo.IndivoModule-summary" style="display: none;">
+    <table class="jd-sumtable-expando">
+    
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountAuthsystemAdd(java.lang.String, java.lang.String, java.lang.String, java.lang.String)">accountAuthsystemAdd</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> userName, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> password, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> system)</nobr>
+        
+        <div class="jd-descrdiv">Add a new method of authentication to an account.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountCheckSecrets(java.lang.String, java.lang.String, java.lang.String)">accountCheckSecrets</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> primarySecret, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> secondarySecret)</nobr>
+        
+        <div class="jd-descrdiv">Validate an account’s primary and secondary secrets.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountCreate(boolean, boolean, java.lang.String, java.lang.String, java.lang.String)">accountCreate</a></span>(boolean primarySecret, boolean secondarySecret, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> contactEmail, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fullName)</nobr>
+        
+        <div class="jd-descrdiv">Create a new account, and send out initialization emails
+
+ </div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountForgotPassword(java.lang.String)">accountForgotPassword</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId)</nobr>
+        
+        <div class="jd-descrdiv">Resets an account if the user has forgotten its password.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountInbox(java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String)">accountInbox</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> status, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> orderBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> limit, boolean includeArchive, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> offset)</nobr>
+        
+        <div class="jd-descrdiv">List messages in an account’s inbox.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountInboxMessage(java.lang.String, java.lang.String)">accountInboxMessage</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> messageId)</nobr>
+        
+        <div class="jd-descrdiv">Retrieve an individual message from an account’s inbox.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountInboxMessageAttachmentAccept(java.lang.String, java.lang.String, java.lang.String)">accountInboxMessageAttachmentAccept</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> messageId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> attachmentNumber)</nobr>
+        
+        <div class="jd-descrdiv">Accept a message attachment into the record it corresponds to.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountInfo(java.lang.String)">accountInfo</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId)</nobr>
+        
+        <div class="jd-descrdiv">Display information about an account.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountInfoSet(java.lang.String, java.lang.String, java.lang.String)">accountInfoSet</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> contactEmail, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fullName)</nobr>
+        
+        <div class="jd-descrdiv">Set basic information about an account.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountInitialize(java.lang.String, java.lang.String, java.lang.String)">accountInitialize</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> primarySecret, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> secondarySecret)</nobr>
+        
+        <div class="jd-descrdiv">Initialize an account, activating it.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountMessageArchive(java.lang.String, java.lang.String)">accountMessageArchive</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> messageId)</nobr>
+        
+        <div class="jd-descrdiv">Archive a message.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)">accountNotifications</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> status, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> orderBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> limit, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> offset)</nobr>
+        
+        <div class="jd-descrdiv">List an account’s notifications.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountPasswordChange(java.lang.String, java.lang.String, java.lang.String)">accountPasswordChange</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> oldPassword, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> newPassword)</nobr>
+        
+        <div class="jd-descrdiv">Change a account’s password.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountPasswordSet(java.lang.String, java.lang.String)">accountPasswordSet</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> password)</nobr>
+        
+        <div class="jd-descrdiv">Force the password of an account to a given value.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountPermissions(java.lang.String)">accountPermissions</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId)</nobr>
+        
+        <div class="jd-descrdiv">List the carenets that an account has access to.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountPrimarySecret(java.lang.String)">accountPrimarySecret</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId)</nobr>
+        
+        <div class="jd-descrdiv">Display an account’s primary secret.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountRecordList(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)">accountRecordList</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> status, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> orderBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> limit, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> offset)</nobr>
+        
+        <div class="jd-descrdiv">List all available records for an account.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountResendSecret(java.lang.String)">accountResendSecret</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId)</nobr>
+        
+        <div class="jd-descrdiv">Sends an account user their primary secret in case they lost it.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountReset(java.lang.String)">accountReset</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId)</nobr>
+        
+        <div class="jd-descrdiv">Reset an account to an uninitialized state.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountSearch(java.lang.String, java.lang.String)">accountSearch</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> contactEmail, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fullName)</nobr>
+        
+        <div class="jd-descrdiv">Search for accounts by name or email.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountSecret(java.lang.String)">accountSecret</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId)</nobr>
+        
+        <div class="jd-descrdiv">Return the secondary secret of an account.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountSendMessage(java.lang.String, java.lang.String, com.mulesoft.module.indivo.IndivoModule.Severity, com.mulesoft.module.indivo.IndivoModule.BodyType, java.lang.String, java.lang.String)">accountSendMessage</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> body, <a href="../../../../../../java/com/mulesoft/module/indivo/IndivoModule.Severity.html">IndivoModule.Severity</a> severity, <a href="../../../../../../java/com/mulesoft/module/indivo/IndivoModule.BodyType.html">IndivoModule.BodyType</a> bodyType, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> messageId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> subject)</nobr>
+        
+        <div class="jd-descrdiv">Send a message to an account.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountSetState(java.lang.String)">accountSetState</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId)</nobr>
+        
+        <div class="jd-descrdiv">Set the state of an account.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#accountUsernameSet(java.lang.String, java.lang.String)">accountUsernameSet</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> userName)</nobr>
+        
+        <div class="jd-descrdiv">Force the username of an account to a given value.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/Object.html">Object</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#allManifests()">allManifests</a></span>()</nobr>
+        
+        <div class="jd-descrdiv">List SMART manifests for all available userapps.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/Object.html">Object</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#allPhas()">allPhas</a></span>()</nobr>
+        
+        <div class="jd-descrdiv">List all available userapps.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appDocumentCreate(java.lang.String, java.lang.Object)">appDocumentCreate</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/Object.html">Object</a> document)</nobr>
+        
+        <div class="jd-descrdiv">Create an app-specific Indivo document.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appDocumentCreateOrUpdate(java.lang.String, java.lang.String, java.lang.Object)">appDocumentCreateOrUpdate</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> documentId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/Object.html">Object</a> document)</nobr>
+        
+        <div class="jd-descrdiv">Create or Overwrite an app-specific Indivo document.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appDocumentCreateOrUpdateExt(java.lang.String, java.lang.String, java.lang.Object)">appDocumentCreateOrUpdateExt</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> externalId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/Object.html">Object</a> document)</nobr>
+        
+        <div class="jd-descrdiv">Create an app-specific Indivo document with an associated external id.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appDocumentDelete(java.lang.String, java.lang.String)">appDocumentDelete</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> documentId)</nobr>
+        
+        <div class="jd-descrdiv">Delete an app-specific document.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appDocumentLabel(java.lang.String, java.lang.String, java.lang.Object)">appDocumentLabel</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> documentId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/Object.html">Object</a> label)</nobr>
+        
+        <div class="jd-descrdiv">Set the label of an app-specific document.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appDocumentList(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)">appDocumentList</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> status, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> orderBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> type, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> limit, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> offset)</nobr>
+        
+        <div class="jd-descrdiv">List app-specific documents.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appDocumentMeta(java.lang.String, java.lang.String)">appDocumentMeta</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> documentId)</nobr>
+        
+        <div class="jd-descrdiv">Fetch the metadata of an app-specific document.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appDocumentMetaExt(java.lang.String, java.lang.String)">appDocumentMetaExt</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> externalId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail)</nobr>
+        
+        <div class="jd-descrdiv">Fetch the metadata of an app-specific document identified by external id.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            JSONObject</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appManifest(java.lang.String)">appManifest</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail)</nobr>
+        
+        <div class="jd-descrdiv">Return a SMART manifest for a single userapp.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appRecordList(java.lang.String)">appRecordList</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail)</nobr>
+        
+        <div class="jd-descrdiv">Return a list of all records that have this pha enabled.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#appSpecificDocument(java.lang.String, java.lang.String)">appSpecificDocument</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> documentId)</nobr>
+        
+        <div class="jd-descrdiv">Retrieve an app-specific document.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#autonomousAccessToken(java.lang.String, java.lang.String)">autonomousAccessToken</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail)</nobr>
+        
+        <div class="jd-descrdiv">Fetch an access token for an autonomous app to access a record.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetAccountCreate(java.lang.String, boolean, java.lang.String)">carenetAccountCreate</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, boolean write, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId)</nobr>
+        
+        <div class="jd-descrdiv">Add an account to a carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetAccountDelete(java.lang.String, java.lang.String)">carenetAccountDelete</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId)</nobr>
+        
+        <div class="jd-descrdiv">Remove an account from a carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetAccountList(java.lang.String)">carenetAccountList</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId)</nobr>
+        
+        <div class="jd-descrdiv">List the accounts in a carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetAccountPermissions(java.lang.String, java.lang.String)">carenetAccountPermissions</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId)</nobr>
+        
+        <div class="jd-descrdiv">List the permissions of an account within a carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetAppsCreate(java.lang.String, java.lang.String)">carenetAppsCreate</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail)</nobr>
+        
+        <div class="jd-descrdiv">Add an app to a carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetAppsDelete(java.lang.String, java.lang.String)">carenetAppsDelete</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail)</nobr>
+        
+        <div class="jd-descrdiv">Remove an app from a given carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            JSONObject</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetAppsList(java.lang.String)">carenetAppsList</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId)</nobr>
+        
+        <div class="jd-descrdiv">List Apps within a given carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetDocument(java.lang.String, java.lang.String)">carenetDocument</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> documentId)</nobr>
+        
+        <div class="jd-descrdiv">Return a document from a carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetDocumentList(java.lang.String, java.lang.String)">carenetDocumentList</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> type)</nobr>
+        
+        <div class="jd-descrdiv">List documents from a given carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetDocumentMeta(java.lang.String, java.lang.String)">carenetDocumentMeta</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> documentId)</nobr>
+        
+        <div class="jd-descrdiv">Fetch the metadata of a record-specific document via a carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetEquipmentList(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)">carenetEquipmentList</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> status, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fieldName, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fieldValue, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> dateGroup, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> groupBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> orderBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> aggregateBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> dateRange, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> limit, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> offset)</nobr>
+        
+        <div class="jd-descrdiv">List the equipment data for a given carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetGenericList(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.mulesoft.module.indivo.IndivoModule.GenericResponseFormat)">carenetGenericList</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> dataModel, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> status, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fieldName, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fieldValue, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> dateGroup, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> groupBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> orderBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> aggregateBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> dateRange, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> limit, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> offset, <a href="../../../../../../java/com/mulesoft/module/indivo/IndivoModule.GenericResponseFormat.html">IndivoModule.GenericResponseFormat</a> responseFormat)</nobr>
+        
+        <div class="jd-descrdiv">List the Model data for a given carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetMeasurementList(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)">carenetMeasurementList</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> labCode, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> status, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fieldName, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fieldValue, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> dateGroup, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> groupBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> orderBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> aggregateBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> dateRange, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> limit, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> offset)</nobr>
+        
+        <div class="jd-descrdiv">List the measurement data for a given carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetProcedureList(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)">carenetProcedureList</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> status, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fieldName, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fieldValue, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> dateGroup, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> groupBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> orderBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> aggregateBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> dateRange, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> limit, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> offset)</nobr>
+        
+        <div class="jd-descrdiv">List the procedure data for a given carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetReadDemographics(java.lang.String, com.mulesoft.module.indivo.IndivoModule.DemographicsResponseFormat)">carenetReadDemographics</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="../../../../../../java/com/mulesoft/module/indivo/IndivoModule.DemographicsResponseFormat.html">IndivoModule.DemographicsResponseFormat</a> responseFormat)</nobr>
+        
+        <div class="jd-descrdiv">Read demographics from a carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetRecord(java.lang.String)">carenetRecord</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId)</nobr>
+        
+        <div class="jd-descrdiv">Get basic information about the record to which a carenet belongs.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetRename(java.lang.String, java.lang.String)">carenetRename</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetName)</nobr>
+        
+        <div class="jd-descrdiv">Change a carenet’s name.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#carenetSimpleClinicalNotesList(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)">carenetSimpleClinicalNotesList</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> carenetId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> status, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fieldName, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> fieldValue, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> dateGroup, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> groupBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> orderBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> aggregateBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> dateRange, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> limit, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> offset)</nobr>
+        
+        <div class="jd-descrdiv">List the simple_clinical_notes data for a given carenet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            JSONObject</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#codingSystemQuery(java.lang.String, java.lang.String)">codingSystemQuery</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> systemShortName, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> query)</nobr>
+        
+        <div class="jd-descrdiv">Query a coding system for a value.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#deleteUserPreferences(java.lang.String, java.lang.String)">deleteUserPreferences</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaId)</nobr>
+        
+        <div class="jd-descrdiv">Delete all app-specific User Preferences for an account.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getAccessToken()">getAccessToken</a></span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getAccessTokenSecret()">getAccessTokenSecret</a></span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getApiUrl(java.lang.String)">getApiUrl</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> path)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getAppKey()">getAppKey</a></span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getAppSecret()">getAppSecret</a></span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            Client</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getClient()">getClient</a></span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getConnectCredentials(java.lang.String, java.lang.String, java.lang.String)">getConnectCredentials</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId)</nobr>
+        
+        <div class="jd-descrdiv">Get oAuth credentials for an app to run in Connect or SMART REST mode.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            OAuthClientFilter</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getOAuthClientFilter(java.lang.String, java.lang.String)">getOAuthClientFilter</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accessToken, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accessTokenSecret)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            int</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getPort()">getPort</a></span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getProtocol()">getProtocol</a></span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            WebResource</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getResource(java.lang.String, java.lang.String, java.lang.String)">getResource</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> url, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accessToken, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accessTokenSecret)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getServer()">getServer</a></span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#getUserPreferences(java.lang.String, java.lang.String)">getUserPreferences</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaId)</nobr>
+        
+        <div class="jd-descrdiv">Get app-specific User Preferences for an account.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            boolean</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#isDebug()">isDebug</a></span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            JSONObject</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#pha(java.lang.String)">pha</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaEmail)</nobr>
+        
+        <div class="jd-descrdiv">Return a description of a single userapp.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#record(java.lang.String)">record</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId)</nobr>
+        
+        <div class="jd-descrdiv">Get information about an individual record.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#recordAppDocumentCreate(java.lang.String, java.lang.String, java.lang.String)">recordAppDocumentCreate</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> document)</nobr>
+        
+        <div class="jd-descrdiv">Create a record-app-specific Indivo document.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#recordAppDocumentCreateOrUpdateExt(java.lang.String, java.lang.String, java.lang.String, java.lang.String)">recordAppDocumentCreateOrUpdateExt</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> externalId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> document)</nobr>
+        
+        <div class="jd-descrdiv">Create or Overwrite a record-app-specific Indivo document with an associated external id.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#recordAppDocumentList(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)">recordAppDocumentList</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> status, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> orderBy, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> type, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> limit, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> offset)</nobr>
+        
+        <div class="jd-descrdiv">List record-app-specific documents.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#recordAppDocumentMetaExt(java.lang.String, java.lang.String, java.lang.String)">recordAppDocumentMetaExt</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> externalId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaId)</nobr>
+        
+        <div class="jd-descrdiv">Create or Overwrite a record-app-specific Indivo document with an associated external id.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#recordCreate(java.lang.String)">recordCreate</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> document)</nobr>
+        
+        <div class="jd-descrdiv">Create a new record.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#recordCreateExt(java.lang.String, java.lang.String, java.lang.String)">recordCreateExt</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> principalEmail, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> externalId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> document)</nobr>
+        
+        <div class="jd-descrdiv">Create a new record with an associated external id..</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            JSONObject</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#recordPha(java.lang.String, java.lang.String)">recordPha</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaId)</nobr>
+        
+        <div class="jd-descrdiv">Get information about a given userapp bound to a record.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#recordPhaDelete(java.lang.String, java.lang.String)">recordPhaDelete</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaId)</nobr>
+        
+        <div class="jd-descrdiv">Remove a userapp from a record.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#recordPhaEnable(java.lang.String, java.lang.String)">recordPhaEnable</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaId)</nobr>
+        
+        <div class="jd-descrdiv">Enable a userapp for a record.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            JSONObject</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#recordPhas(java.lang.String, java.lang.String)">recordPhas</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> type)</nobr>
+        
+        <div class="jd-descrdiv">List userapps bound to a given record.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#recordSearch(java.lang.String)">recordSearch</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> label)</nobr>
+        
+        <div class="jd-descrdiv">Search for records by label (usually the same as full name).</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#setAccessToken(java.lang.String)">setAccessToken</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accessToken)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#setAccessTokenSecret(java.lang.String)">setAccessTokenSecret</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accessTokenSecret)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#setAppKey(java.lang.String)">setAppKey</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> appKey)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#setAppSecret(java.lang.String)">setAppSecret</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> appSecret)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#setDebug(boolean)">setDebug</a></span>(boolean debug)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#setPort(int)">setPort</a></span>(int port)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#setProtocol(java.lang.String)">setProtocol</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> protocol)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#setServer(java.lang.String)">setServer</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> server)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#setUserPreferences(java.lang.String, java.lang.String)">setUserPreferences</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> accountId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> phaId)</nobr>
+        
+        <div class="jd-descrdiv">Set app-specific User Preferences for an account.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#smartAllergies(java.lang.String)">smartAllergies</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId)</nobr>
+        
+        <div class="jd-descrdiv">SMART allergy list, serialized as RDF/XML.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#smartAllergiesInstance(java.lang.String, java.lang.String)">smartAllergiesInstance</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> modelId)</nobr>
+        
+        <div class="jd-descrdiv">Retrieve a specific instance of a SMART Allergy/AllergyExclusion
+
+ </div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            JSONObject</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#smartCapabilities()">smartCapabilities</a></span>()</nobr>
+        
+        <div class="jd-descrdiv">SMART Capabilities [SMART-COMPATIBLE]
+
+ </div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#smartGeneric(java.lang.String, java.lang.String)">smartGeneric</a></span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> recordId, <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a> modelName)</nobr>
+        
+        <div class="jd-descrdiv">SMART-compatible alias for the generic list view: returns data_models serialized as SMART RDF.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">InputStream</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad"><a href="../../../../../../com/mulesoft/module/indivo/IndivoModule.html#smartOntology()">smartOntology</a></span>()</nobr>
+        
+        <div class="jd-descrdiv">Fetch the SMART ontology as RDF/XML.</div>
+  
+  </td></tr>
+
+
+</table>
+  </div>
+</div>
+</td></tr>
+
+
+
+<tr class="api apilevel-" >
+<td colspan="12">
+  <a href="#" onclick="return toggleInherited(this, null)" id="inherited-methods-java.lang.Object" class="jd-expando-trigger closed"
+          ><img id="inherited-methods-java.lang.Object-trigger"
+          src="../../../../../../assets/images/triangle-closed.png"
+          class="jd-expando-trigger-img" /></a>
+From class
+
+  <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/Object.html">java.lang.Object</a>
+
+<div id="inherited-methods-java.lang.Object">
+  <div id="inherited-methods-java.lang.Object-list"
+        class="jd-inheritedlinks">
+  </div>
+  <div id="inherited-methods-java.lang.Object-summary" style="display: none;">
+    <table class="jd-sumtable-expando">
+    
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/Object.html">Object</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad">clone</span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            boolean</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad">equals</span>(<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/Object.html">Object</a> arg0)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad">finalize</span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            final
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/Class.html">Class</a>&lt;?&gt;</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad">getClass</span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            int</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad">hashCode</span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            final
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad">notify</span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            final
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad">notifyAll</span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            
+            
+            
+            <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/lang/String.html">String</a></nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad">toString</span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            final
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad">wait</span>()</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            final
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad">wait</span>(long arg0, int arg1)</nobr>
+        
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            
+            
+            final
+            
+            
+            void</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad">wait</span>(long arg0)</nobr>
+        
+  </td></tr>
+
+
+</table>
+  </div>
+</div>
+</td></tr>
+
+
+
+<tr class="api apilevel-" >
+<td colspan="12">
+  <a href="#" onclick="return toggleInherited(this, null)" id="inherited-methods-org.mule.api.Capabilities" class="jd-expando-trigger closed"
+          ><img id="inherited-methods-org.mule.api.Capabilities-trigger"
+          src="../../../../../../assets/images/triangle-closed.png"
+          class="jd-expando-trigger-img" /></a>
+From interface
+
+  org.mule.api.Capabilities
+
+<div id="inherited-methods-org.mule.api.Capabilities">
+  <div id="inherited-methods-org.mule.api.Capabilities-list"
+        class="jd-inheritedlinks">
+  </div>
+  <div id="inherited-methods-org.mule.api.Capabilities-summary" style="display: none;">
+    <table class="jd-sumtable-expando">
+    
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol"><nobr>
+            abstract
+            
+            
+            
+            
+            boolean</nobr>
+        </td>
+        <td class="jd-linkcol" width="100%"><nobr>
+        <span class="sympad">isCapableOf</span>(Capability arg0)</nobr>
+        
+  </td></tr>
+
+
+</table>
+  </div>
+</div>
+</td></tr>
+
+
+</table>
+
+
+</div><!-- jd-descr (summary) -->
+
+<!-- Details -->
+
+
+
+
+
+
+
+
+<!-- XML Attributes -->
+
+
+<!-- Enum Values -->
+
+
+<!-- Constants -->
+
+
+<!-- Fields -->
+
+
+<!-- Public ctors -->
+
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<h2>Public Constructors</h2>
+
+
+
+<A NAME="IndivoModuleCapabilitiesAdapter()"></A>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+         
+         
+        
+      </span>
+      <span class="sympad">IndivoModuleCapabilitiesAdapter</span>
+      <span class="normal">()</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p></p></div>
+
+    </div>
+</div>
+
+
+
+
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<!-- Protected ctors -->
+
+
+
+<!-- ========= METHOD DETAIL ======== -->
+<!-- Public methdos -->
+
+<h2>Public Methods</h2>
+
+
+
+<A NAME="isCapableOf(org.mule.api.Capability)"></A>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+         
+         
+        boolean
+      </span>
+      <span class="sympad">isCapableOf</span>
+      <span class="normal">(Capability capability)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>Returns true if this module implements such capability
+ 
+</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>capability</td>
+          <td></td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+
+
+
+<!-- ========= METHOD DETAIL ======== -->
+
+
+
+<!-- ========= END OF CLASS DATA ========= -->
+<A NAME="navbar_top"></A>
+
+<div id="footer">
+Generated by <a href="http://www.mulesoft.com/devkit">Mule DevKit</a>. Document generation technology based on <a href="http://code.google.com/p/doclava/">Google's Doclava</a>.
+</div> <!-- end footer -->
+
+</div> <!-- jd-content -->
+
+</div><!-- end doc-content -->
+
+</div> <!-- end body-content --> 
+
+<script type="text/javascript">
+init(); /* initialize mule-developer-docs.js */
+</script>
+
+</body>
+</html>
