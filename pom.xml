@@ -197,6 +197,11 @@
             <version>1.2.1.2</version>
         </dependency>
         <dependency>
+            <groupId>oauth.signpost</groupId>
+            <artifactId>signpost-commonshttp4</artifactId>
+            <version>1.2.1.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse</groupId>
             <artifactId>eclipse-workbench</artifactId>
             <version>3.6.1.M20100826-1330</version>
@@ -312,4 +317,14 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
+    
+    <scm>
+   <connection>
+       scm:git:git://github.com:mulesoft-services/mule-module-indivo.git
+   </connection>
+   <developerConnection>
+       scm:git:git@github.com:mulesoft-services/mule-module-indivo.git
+   </developerConnection>
+   <url>http://github.com/mulesoft-services/mule-module-indivo</url>
+</scm>
 </project>

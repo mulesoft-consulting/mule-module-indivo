@@ -1,2 +1,5 @@
+Connector documentation: http://mulesoft-services.github.com/mule-module-indivo/mule/indivo-config.html
 
-THIS DOES NOT WORK AT ALL, DON"T DOWNLOAD
+Indivo API Reference: http://docs.indivohealth.org/en/v2.0.0/api-reference.html
+
+Indivo Sandbox: http://sandbox.indivohealth.org

@@ -28,9 +28,13 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connector;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.oauth.*;
+import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuthAccessToken;
+import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
+import org.mule.api.annotations.oauth.OAuthAuthorizationParameter;
+import org.mule.api.annotations.oauth.OAuthConsumerKey;
+import org.mule.api.annotations.oauth.OAuthConsumerSecret;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.util.StringUtils;
@@ -51,14 +55,19 @@ import com.sun.jersey.oauth.signature.OAuthSecrets;
  * @author MuleSoft, Inc.
  */
 @Connector(name="indivo", schemaVersion="3.3.0")
-@OAuth(requestTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/request_token",
+@OAuth(provider=com.mulesoft.module.indivo.IndivoOAuthProvider.class,
+       requestTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/request_token",
        accessTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/access_token",
        authorizationUrl = "http://sandbox.indivohealth.org/oauth/authorize",
        authorizationParameters = {
-               @OAuthAuthorizationParameter(name = "record_id", type = String.class, optional = true),
-               @OAuthAuthorizationParameter(name = "carenet_id", type = String.class, optional = true)
-       },
-       verifierRegex = "oauth_token=([^&]+)")
+               @OAuthAuthorizationParameter(name = "indivo_record_id", type = String.class, optional = true),
+               @OAuthAuthorizationParameter(name = "indivo_carenet_id", type = String.class, optional = true)
+       })
+
+//,
+       
+       //verifierRegex = "oauth_token=([^&]+)")
+       
 public class IndivoModule
 {
     /**
@@ -75,6 +84,14 @@ public class IndivoModule
     @Default("80")
     private int port;
     
+    /**
+     * Indivo server protocol 
+     */
+    @Configurable
+    @Optional
+    @Default("https")
+    private String protocol;
+
     /**
      * Application key
      */
@@ -1231,15 +1248,15 @@ public class IndivoModule
      * ]
      */
     @Processor
-    public JSONObject allPhas() throws Exception
+    public Object allPhas() throws Exception
     {
         final String apiUrl = getApiUrl("apps/");
 
         WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
         
         String response = r.get(String.class);
-        JSONObject jsonResponse = (JSONObject) JSONValue.parse(response);
-        return jsonResponse;
+        
+        return JSONValue.parse(response);
     }
 
     /**
@@ -1280,15 +1297,15 @@ public class IndivoModule
      * ]
      */
     @Processor
-    public JSONObject allManifests() throws Exception
+    public Object allManifests() throws Exception
     {
         final String apiUrl = getApiUrl("apps/manifests/");
 
         WebResource r = getResource(apiUrl, accessToken, accessTokenSecret);        
         
         String response = r.get(String.class);
-        JSONObject jsonResponse = (JSONObject) JSONValue.parse(response);
-        return jsonResponse;
+        
+        return JSONValue.parse(response);
     }
     
     /**
@@ -4043,7 +4060,10 @@ public class IndivoModule
      */
     protected String getApiUrl(String path)
     {
-        return String.format("%s://%s/%s", "https", getServer(), path);
+        if (port != 80)
+            return String.format("%s://%s:%s/%s", getProtocol(), getServer(), getPort(), path);
+        else
+            return String.format("%s://%s/%s", getProtocol(), getServer(), path);
     }
     
     protected Client getClient() {
@@ -4163,5 +4183,15 @@ public class IndivoModule
 
     public void setAccessTokenSecret(String accessTokenSecret) {
         this.accessTokenSecret = accessTokenSecret;
+    }
+
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 }
