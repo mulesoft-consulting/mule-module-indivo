@@ -187,6 +187,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <artifactId>mule-transport-http</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <version>${mule.version}</version>
+            <scope>compile</scope>
+        </dependency> 
+        <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-annotations</artifactId>
             <version>${mule.devkit.version}</version>

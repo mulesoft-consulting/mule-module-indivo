@@ -294,9 +294,233 @@
     <indivo:record-app-document-create-or-update-ext recordId="123" externalId="xyz" phaId="muley@mulesoft.com" document="#[payload]"/>
 <!-- END_INCLUDE(indivo:record-app-document-create-or-update-ext) -->
 
+<!-- BEGIN_INCLUDE(indivo:record-app-document-meta) -->
+    <indivo:record-app-document-meta recordId="123" documentId="xyz" phaId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:record-app-document-meta) -->
+
 <!-- BEGIN_INCLUDE(indivo:record-app-document-meta-ext) -->
     <indivo:record-app-document-meta-ext recordId="123" externalId="xyz" phaId="muley@mulesoft.com"/>
 <!-- END_INCLUDE(indivo:record-app-document-meta-ext) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-app-document-delete) -->
+    <indivo:record-app-document-delete recordId="123" documentId="xyz" phaId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:record-app-document-delete) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-app-specific-document) -->
+    <indivo:record-app-specific-document recordId="123" documentId="xyz" phaId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:record-app-specific-document) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-app-document-label) -->
+    <indivo:record-app-document-label recordId="123" documentId="xyz" phaId="muley@mulesoft.com" label="HelloWorld"/>
+<!-- END_INCLUDE(indivo:record-app-document-label) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-pha-setup) -->
+    <indivo:record-pha-setup recordId="123" phaId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:record-pha-setup) -->
+
+<!-- BEGIN_INCLUDE(indivo:audit-record-view) -->
+    <indivo:audit-record-view recordId="123"/>
+<!-- END_INCLUDE(indivo:audit-record-view) -->
+
+<!-- BEGIN_INCLUDE(indivo:audit-document-view) -->
+    <indivo:audit-document-view recordId="123" documentId="xyz"/>
+<!-- END_INCLUDE(indivo:audit-document-view) -->
+
+<!-- BEGIN_INCLUDE(indivo:audit-function-view) -->
+    <indivo:audit-function-view recordId="123" documentId="xyz" functionName="fooBar"/>
+<!-- END_INCLUDE(indivo:audit-function-view) -->
+
+<!-- BEGIN_INCLUDE(indivo:audit-query) -->
+    <indivo:audit-query recordId="123"/>
+<!-- END_INCLUDE(indivo:audit-query) -->
+
+<!-- BEGIN_INCLUDE(indivo:autoshare-list) -->
+    <indivo:autoshare-list recordId="123" type="http://indivo.org/vocab/xml/documents#Medication"/>
+<!-- END_INCLUDE(indivo:autoshare-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:autoshare-list-by-type-all) -->
+    <indivo:autoshare-list-by-type-all recordId="123"/>
+<!-- END_INCLUDE(indivo:autoshare-list-by-type-all) -->
+
+<!-- BEGIN_INCLUDE(indivo:autoshare-create) -->
+    <indivo:autoshare-create recordId="123" carenetId="xyz" type="http://indivo.org/vocab/xml/documents#Medication"/>
+<!-- END_INCLUDE(indivo:autoshare-create) -->
+
+<!-- BEGIN_INCLUDE(indivo:autoshare-delete) -->
+    <indivo:autoshare-delete recordId="123" carenetId="xyz" type="http://indivo.org/vocab/xml/documents#Medication"/>
+<!-- END_INCLUDE(indivo:autoshare-delete) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-list) -->
+    <indivo:carenet-list recordId="123"/>
+<!-- END_INCLUDE(indivo:carenet-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-create) -->
+    <indivo:carenet-create recordId="123" label="MuleCarenet"/>
+<!-- END_INCLUDE(indivo:carenet-create) -->
+
+<!-- BEGIN_INCLUDE(indivo:read-demographics) -->
+    <indivo:read-demographics recordId="123"/>
+<!-- END_INCLUDE(indivo:read-demographics) -->
+
+<!-- BEGIN_INCLUDE(indivo:set-demographics) -->
+    <indivo:set-demographics recordId="123"/>
+<!-- END_INCLUDE(indivo:set-demographics) -->
+
+<!-- BEGIN_INCLUDE(indivo:documents-delete) -->
+    <indivo:documents-delete recordId="123"/>
+<!-- END_INCLUDE(indivo:documents-delete) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-document-list) -->
+    <indivo:record-document-list recordId="123" type="http://indivo.org/vocab/xml/documents#Medication"/>
+<!-- END_INCLUDE(indivo:record-document-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-create) -->
+    <indivo:document-create recordId="123" document="#[payload]"/>
+<!-- END_INCLUDE(indivo:document-create) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-create-by-ext-id) -->
+    <indivo:document-create-by-ext-id recordId="123" externalId="xyz" phaId="muley@mulesoft.com" document="#[payload]"/>
+<!-- END_INCLUDE(indivo:document-create-by-ext-id) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-document-label-ext) -->
+    <indivo:record-document-label-ext recordId="123" externalId="xyz" phaId="muley@mulesoft.com" label="NewLabel"/>
+<!-- END_INCLUDE(indivo:record-document-label-ext) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-rels) -->
+    <indivo:document-rels recordId="123" objectRelDocumentId="xyz" subjectRelDocumentId="abc" rel="annotation"/>
+<!-- END_INCLUDE(indivo:document-rels) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-specific-document) -->
+    <indivo:record-specific-document recordId="123" documentId="xyz"/>
+<!-- END_INCLUDE(indivo:record-specific-document) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-carenets) -->
+    <indivo:document-carenets recordId="123" documentId="xyz"/>
+<!-- END_INCLUDE(indivo:document-carenets) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-document-delete) -->
+    <indivo:carenet-document-delete recordId="123" documentId="xyz" carenetId="abc"/>
+<!-- END_INCLUDE(indivo:carenet-document-delete) -->
+
+<!-- BEGIN_INCLUDE(indivo:carenet-document-placement) -->
+    <indivo:carenet-document-placement recordId="123" documentId="xyz" carenetId="abc"/>
+<!-- END_INCLUDE(indivo:carenet-document-placement) -->
+
+<!-- BEGIN_INCLUDE(indivo:autoshare-revert) -->
+    <indivo:autoshare-revert recordId="123" documentId="xyz" carenetId="abc"/>
+<!-- END_INCLUDE(indivo:autoshare-revert) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-document-label) -->
+    <indivo:record-document-label recordId="123" documentId="xyz" label="RELABELED: New HBA1C reading"/>
+<!-- END_INCLUDE(indivo:record-document-label) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-document-meta) -->
+    <indivo:record-document-meta recordId="123" documentId="xyz"/>
+<!-- END_INCLUDE(indivo:record-document-meta) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-document-meta-ext) -->
+    <indivo:record-document-meta-ext recordId="123" phaId="muley@mulesoft.com" externalId="xyz"/>
+<!-- END_INCLUDE(indivo:record-document-meta-ext) -->
+
+<!-- BEGIN_INCLUDE(indivo:update-document-meta) -->
+    <indivo:update-document-meta recordId="123" documentId="xyz"/>
+<!-- END_INCLUDE(indivo:update-document-meta) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-remove-nevershare) -->
+    <indivo:document-remove-nevershare recordId="123" documentId="xyz"/>
+<!-- END_INCLUDE(indivo:document-remove-nevershare) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-set-nevershare) -->
+    <indivo:document-set-nevershare recordId="123" documentId="xyz"/>
+<!-- END_INCLUDE(indivo:document-set-nevershare) -->
+
+<!-- BEGIN_INCLUDE(indivo:get-documents-by-rel) -->
+    <indivo:get-documents-by-rel recordId="123" documentId="xyz" rel="annotation"/>
+<!-- END_INCLUDE(indivo:get-documents-by-rel) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-create-by-rel) -->
+    <indivo:document-create-by-rel recordId="123" documentId="xyz" rel="annotation" document="#[payload]"/>
+<!-- END_INCLUDE(indivo:document-create-by-rel) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-create-by-rel-with-ext-id) -->
+    <indivo:document-create-by-rel-with-ext-id recordId="123" documentId="xyz" rel="annotation" externalId="xyz" phaId="muley@mulesoft.com" document="#[payload]"/>
+<!-- END_INCLUDE(indivo:document-create-by-rel-with-ext-id) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-version) -->
+    <indivo:document-version recordId="123" documentId="xyz" document="#[payload]"/>
+<!-- END_INCLUDE(indivo:document-version) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-version-by-ext-id) -->
+    <indivo:document-version-by-ext-id recordId="123" documentId="xyz" externalId="xyz" phaId="muley@mulesoft.com" document="#[payload]"/>
+<!-- END_INCLUDE(indivo:document-version-by-ext-id) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-set-status) -->
+    <indivo:document-set-status recordId="123" documentId="xyz" status="Archived" reason="No longer relevant"/>
+<!-- END_INCLUDE(indivo:document-set-status) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-status-history) -->
+    <indivo:document-status-history recordId="123" documentId="xyz"/>
+<!-- END_INCLUDE(indivo:document-status-history) -->
+
+<!-- BEGIN_INCLUDE(indivo:document-versions) -->
+    <indivo:document-versions recordId="123" documentId="xyz"/>
+<!-- END_INCLUDE(indivo:document-versions) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-send-message) -->
+    <indivo:record-send-message recordId="xyz" numAttachments="1" body="hello" severity="low" bodyType="plaintext" messageId="12345" subject="Test"/>
+<!-- END_INCLUDE(indivo:record-send-message) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-message-attach) -->
+    <indivo:record-message-attach recordId="xyz" attachmentNum="1" messageId="12345" attachment="#[payload]"/>
+<!-- END_INCLUDE(indivo:record-message-attach) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-notify) -->
+    <indivo:record-notify recordId="xyz" content="#[payload]"/>
+<!-- END_INCLUDE(indivo:record-notify) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-get-owner) -->
+    <indivo:record-get-owner recordId="xyz"/>
+<!-- END_INCLUDE(indivo:record-get-owner) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-set-owner) -->
+    <indivo:record-set-owner recordId="xyz" ownerId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:record-set-owner) -->
+
+<!-- BEGIN_INCLUDE(indivo:report-ccr) -->
+    <indivo:report-ccr recordId="xyz"/>
+<!-- END_INCLUDE(indivo:report-ccr) -->
+
+<!-- BEGIN_INCLUDE(indivo:equipment-list) -->
+    <indivo:equipment-list recordId="123"/>
+<!-- END_INCLUDE(indivo:equipment-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:measurement-list) -->
+    <indivo:measurement-list recordId="123" labCode="xyz213"/>
+<!-- END_INCLUDE(indivo:measurement-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:procedure-list) -->
+    <indivo:procedure-list recordId="123"/>
+<!-- END_INCLUDE(indivo:procedure-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:simple-clinical-notes-list) -->
+    <indivo:simple-clinical-notes-list recordId="123"/>
+<!-- END_INCLUDE(indivo:simple-clinical-notes-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:generic-list) -->
+    <indivo:generic-list recordId="123" dataModel="xyz"/>
+<!-- END_INCLUDE(indivo:generic-list) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-shares) -->
+    <indivo:record-shares recordId="123"/>
+<!-- END_INCLUDE(indivo:record-shares) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-share-add) -->
+    <indivo:record-share-add recordId="123" accountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:record-share-add) -->
+
+<!-- BEGIN_INCLUDE(indivo:record-share-delete) -->
+    <indivo:record-share-delete recordId="123" otherAccountId="muley@mulesoft.com"/>
+<!-- END_INCLUDE(indivo:record-share-delete) -->
 
 <!-- BEGIN_INCLUDE(indivo:smart-ontology) -->
     <indivo:smart-ontology/>
@@ -313,3 +537,11 @@
 <!-- BEGIN_INCLUDE(indivo:smart-generic) -->
     <indivo:smart-generic recordId="1234567890" modelName="problems"/>
 <!-- END_INCLUDE(indivo:smart-generic) -->
+
+<!-- BEGIN_INCLUDE(indivo:smart-generic-instance) -->
+    <indivo:smart-generic-instance recordId="1234567890" modelName="problems" modelId="987"/>
+<!-- END_INCLUDE(indivo:smart-generic-instance) -->
+
+<!-- BEGIN_INCLUDE(indivo:get-version) -->
+    <indivo:get-version/>
+<!-- END_INCLUDE(indivo:get-version) -->
