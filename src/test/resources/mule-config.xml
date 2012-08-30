@@ -9,10 +9,11 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/indivo http://www.mulesoft.org/schema/mule/indivo/3.3.0/mule-indivo.xsd">
 
-    <indivo:config myProperty="Some string"/>
-
-    <flow name="testFlow">
-        <indivo:my-processor content="Another string"/>
-    </flow>
-
+    <indivo:config name="IndivoConfig" appSecret="yourwebapp" appKey="sampleweb@apps.indivo.org" server="sandbox.indivohealth.org" port="8000" protocol="http"
+                   accessTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/access_token"                 
+                   requestTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/request_token"
+                   authorizationUrl = "http://sandbox.indivohealth.org/oauth/authorize">
+        <indivo:oauth-callback-config domain="localhost" localPort="8001" remotePort="8001" async="false" path="after_auth"/>
+    </indivo:config>
+    
 </mule>

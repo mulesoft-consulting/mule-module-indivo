@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="mule-config">
-    <global-unknown entity-id="d60ba22d-9f24-496c-89f2-05af2f418eb6">
-        <content>&lt;indivo:config xmlns:indivo=&quot;http://www.mulesoft.org/schema/mule/indivo&quot; myProperty=&quot;Some string&quot;/&gt;</content>
-    </global-unknown>
-    <flow SubFlow="false" name="testFlow">
+    <global-element type="http://www.mulesoft.org/schema/mule/indivo/config" name="Indivo" entity-id="b98c8b9b-4076-48c8-af17-3c1c78614ae0">
         <properties>
-            <property name="processingStrategy2"/>
-            <property name="processingStrategy"/>
-            <property name="bussinessEventsLabel"/>
-            <property name="tracking:enable-default-events"/>
+            <property value="IndivoConfig" name="name"/>
+            <property value="sandbox.indivohealth.org" name="server"/>
+            <property value="8000" name="port"/>
+            <property value="sampleweb@apps.indivo.org" name="appKey"/>
+            <property value="yourwebapp" name="appSecret"/>
+            <property value="http" name="protocol"/>
+            <property name="debug"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/indivo/oauth-callback-config;0">
+                <property value="after_auth" name="path"/>
+                <property value="localhost" name="domain"/>
+                <property value="8001" name="remotePort"/>
+                <property value="8001" name="localPort"/>
+            </property-collection>
         </properties>
-        <lane hadOnlyOneElement="false" entity-id="8d3e5908-e9d2-4025-b3fc-9fe44f4d8eaf">
-            <unknown entity-id="4edab6b8-907d-49c5-adec-7401c0f390a5">
-                <content>&lt;indivo:my-processor xmlns:indivo=&quot;http://www.mulesoft.org/schema/mule/indivo&quot; content=&quot;Another string&quot;/&gt;</content>
-            </unknown>
-        </lane>
-    </flow>
+    </global-element>
 </mule-configuration>
