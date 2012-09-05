@@ -58,11 +58,11 @@ import com.sun.jersey.oauth.signature.HMAC_SHA1;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 /**
- * Cloud Connector
+ * Indivo module
  *
  * @author MuleSoft, Inc.
  */
-@Connector(name="indivo", schemaVersion="3.3.0")
+@Connector(name="indivo", schemaVersion="3.3.1")
 @OAuth(provider=com.mulesoft.module.indivo.IndivoOAuthProvider.class,
        requestTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/request_token",
        accessTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/access_token",
@@ -71,10 +71,6 @@ import com.sun.jersey.oauth.signature.OAuthSecrets;
                @OAuthAuthorizationParameter(name = "indivo_record_id", type = String.class, optional = true),
                @OAuthAuthorizationParameter(name = "indivo_carenet_id", type = String.class, optional = true)
        })
-
-//,
-       
-       //verifierRegex = "oauth_token=([^&]+)")
        
 public abstract class IndivoModule
 {
