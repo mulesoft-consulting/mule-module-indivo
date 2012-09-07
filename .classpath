@@ -5,7 +5,6 @@
 	<classpathentry excluding="**/*.java" kind="src" path="src/main/resources"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry excluding="**/*.java" kind="src" path="src/test/resources"/>
-	<classpathentry kind="src" path="target/generated-sources/mule"/>
 	<classpathentry kind="con" path="MULE_RUNTIME"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1-osgi/activation-1.1-osgi.jar" sourcepath="M2_REPO/javax/activation/activation/1.1-osgi/activation-1.1-osgi-sources.jar"/>

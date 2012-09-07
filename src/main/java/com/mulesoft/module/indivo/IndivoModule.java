@@ -68,8 +68,8 @@ import com.sun.jersey.oauth.signature.OAuthSecrets;
        accessTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/access_token",
        authorizationUrl = "http://sandbox.indivohealth.org/oauth/authorize",
        authorizationParameters = {
-               @OAuthAuthorizationParameter(name = "indivo_record_id", type = String.class, optional = true),
-               @OAuthAuthorizationParameter(name = "indivo_carenet_id", type = String.class, optional = true)
+               @OAuthAuthorizationParameter(name = "indivo_record_id", type = String.class, optional = true, description=""),
+               @OAuthAuthorizationParameter(name = "indivo_carenet_id", type = String.class, optional = true, description="")
        })
        
 public abstract class IndivoModule
