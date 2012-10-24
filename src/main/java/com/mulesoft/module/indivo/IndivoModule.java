@@ -36,6 +36,7 @@ import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.oauth.OAuthAuthorizationParameter;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
+import org.mule.api.annotations.oauth.OAuthProtected;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.rest.HttpMethod;
@@ -62,7 +63,7 @@ import com.sun.jersey.oauth.signature.OAuthSecrets;
  *
  * @author MuleSoft, Inc.
  */
-@Connector(name="indivo", schemaVersion="3.3.1")
+@Connector(name="indivo", schemaVersion="3.3")
 @OAuth(provider=com.mulesoft.module.indivo.IndivoOAuthProvider.class,
        requestTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/request_token",
        accessTokenUrl = "http://sandbox.indivohealth.org:8000/oauth/access_token",
@@ -218,8 +219,9 @@ public abstract class IndivoModule
 	 *	  <authSystem name="hospital_sso" username="Joe_User" />
 	 *	</Account>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/search", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/search", 
               method = HttpMethod.GET, 
               exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String accountSearch(@RestQueryParam("contact_email") @Optional @Default("") String contactEmail,
@@ -250,8 +252,9 @@ public abstract class IndivoModule
      *    <authSystem name="hospital_sso" username="Joe_User" />
      *  </Account>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}", 
               method = HttpMethod.GET, 
               exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String accountInfo(@RestUriParam("account_id") String accountId) throws IOException;
@@ -282,8 +285,9 @@ public abstract class IndivoModule
      *   <ExpiresAt>2012-07-04T00:00:00Z</ExpiresAt>
      * </ConnectCredentials>     
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/apps/{pha_id}/connect_credentials", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/apps/{pha_id}/connect_credentials", 
             method = HttpMethod.POST, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String getConnectCredentials(@RestUriParam("account_id") String accountId,
@@ -302,8 +306,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/apps/{pha_id}/preferences", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/apps/{pha_id}/preferences", 
             method = HttpMethod.DELETE, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})                
     public abstract String deleteUserPreferences(@RestUriParam("account_id") String accountId,
@@ -321,8 +326,9 @@ public abstract class IndivoModule
      * 
      * @return app-specific user preferences. Preferences format is defined by the app setting the preferences, and will therefore vary.
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/apps/{pha_id}/preferences", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/apps/{pha_id}/preferences", 
               method = HttpMethod.GET, 
               exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String getUserPreferences(@RestUriParam("account_id") String accountId,
@@ -340,8 +346,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/apps/{pha_id}/preferences", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/apps/{pha_id}/preferences", 
             method = HttpMethod.PUT, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String setUserPreferences(@RestUriParam("account_id") String accountId,
@@ -361,8 +368,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/authsystems", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/authsystems", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountAuthsystemAdd(@RestUriParam("account_id") String accountId,
@@ -383,8 +391,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/authsystems/password/change", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/authsystems/password/change", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountPasswordChange(@RestUriParam("account_id") String accountId,
@@ -403,8 +412,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/authsystems/password/change", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/authsystems/password/change", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountPasswordSet(@RestUriParam("account_id") String accountId,
@@ -422,8 +432,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/authsystems/password/set-username", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/authsystems/password/set-username", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountUsernameSet(@RestUriParam("account_id") String accountId,
@@ -442,8 +453,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}//check-secrets/{primary_secret}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}//check-secrets/{primary_secret}", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountCheckSecrets(@RestUriParam("account_id") String accountId,
@@ -464,8 +476,9 @@ public abstract class IndivoModule
      * 
      * <secret>123456</secret>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/forgot-password", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/forgot-password", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountForgotPassword(@RestUriParam("account_id") String accountId) throws IOException;
@@ -554,8 +567,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{account_id}/inbox/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{account_id}/inbox/", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String accountSendMessage(@RestUriParam("account_id") String accountId,
@@ -590,8 +604,9 @@ public abstract class IndivoModule
      *   <attachment num="1" type="http://indivo.org/vocab/xml/documents#Models" size="12546" />
      * </Message>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/inbox/{message_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/inbox/{message_id}", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String accountInboxMessage(@RestUriParam("account_id") String accountId,
@@ -609,8 +624,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/inbox/{message_id}/archive", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/inbox/{message_id}/archive", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountMessageArchive(@RestUriParam("account_id") String accountId,
@@ -629,8 +645,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/inbox/{message_id}/attachments/{attachment_number}/accept", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/inbox/{message_id}/attachments/{attachment_number}/accept", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountInboxMessageAttachmentAccept(@RestUriParam("account_id") String accountId,
@@ -650,8 +667,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/info-set", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/info-set", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountInfoSet(@RestUriParam("account_id") String accountId,
@@ -671,8 +689,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/initialize/{primary_secret}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/initialize/{primary_secret}", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountInitialize(@RestUriParam("account_id") String accountId,
@@ -707,8 +726,9 @@ public abstract class IndivoModule
      * 
      * </Notifications>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/notifications/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/notifications/", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountNotifications(@RestUriParam("account_id") String accountId,
@@ -733,8 +753,9 @@ public abstract class IndivoModule
      *     <Carenet id="567" name="school" mode="explicit" />
      * </Carenets>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/permissions/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/permissions/", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountPermissions(@RestUriParam("account_id") String accountId) throws IOException;
@@ -752,8 +773,9 @@ public abstract class IndivoModule
      * Example Return Value:
      * <secret>123absxzyasdg13b</secret>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/primary-secret", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/primary-secret", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountPrimarySecret(@RestUriParam("account_id") String accountId) throws IOException;
@@ -782,8 +804,9 @@ public abstract class IndivoModule
      * 
      * </Records>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/records/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/records/", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountRecordList(@RestUriParam("account_id") String accountId,
@@ -803,8 +826,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/reset", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/reset", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountReset(@RestUriParam("account_id") String accountId) throws IOException;
@@ -822,8 +846,9 @@ public abstract class IndivoModule
      * Example Return Value:
      * <secret>123456</secret>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/secret", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/secret", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String accountSecret(@RestUriParam("account_id") String accountId) throws IOException;
@@ -839,8 +864,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/secret-resend", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/secret-resend", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String accountResendSecret(@RestUriParam("account_id") String accountId) throws IOException;
@@ -856,8 +882,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/set-state", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/accounts/{accound_id}/set-state", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String accountSetState(@RestUriParam("account_id") String accountId) throws IOException;
@@ -898,8 +925,9 @@ public abstract class IndivoModule
      * 
      * ]
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String allPhas() throws IOException;
@@ -939,8 +967,9 @@ public abstract class IndivoModule
      * 
      * ]
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/manifests/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/manifests/", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String allManifests() throws IOException;
@@ -976,8 +1005,9 @@ public abstract class IndivoModule
      *     }
      * }
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String pha(@RestUriParam("pha_email") String phaEmail) throws IOException;
@@ -1026,8 +1056,9 @@ public abstract class IndivoModule
      * 
      * </Documents>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String appDocumentList(@RestUriParam("pha_email") String phaEmail, 
@@ -1073,12 +1104,13 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/", 
-            method = HttpMethod.PUT, contentType="application/x-www-form-urlencoded",
+   @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/", 
+            method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String appDocumentCreate(@RestUriParam("pha_email") String phaEmail,
-                                    Object document) throws IOException;
+                                    String document) throws IOException;
 
     /**
      * Create an app-specific Indivo document with an associated external id.
@@ -1110,8 +1142,9 @@ public abstract class IndivoModule
      *   <nevershare>false</nevershare>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/external/{external_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/external/{external_id}", 
             method = HttpMethod.PUT, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String appDocumentCreateOrUpdateExt(@RestUriParam("external_id") String externalId,
@@ -1146,8 +1179,9 @@ public abstract class IndivoModule
      *   <nevershare>false</nevershare>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/external/{external_id}/meta", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/external/{external_id}/meta", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String appDocumentMetaExt(@RestUriParam("external_id") String externalId,
@@ -1165,8 +1199,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/{document_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/{document_id}", 
             method = HttpMethod.DELETE, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String appDocumentDelete(@RestUriParam("pha_email")String phaEmail,
@@ -1190,8 +1225,9 @@ public abstract class IndivoModule
      *   <Preference name="show_rels" value="false" />
      * </DefaultProblemsPreferences>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/{document_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/{document_id}", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String  appSpecificDocument(@RestUriParam("pha_email")String phaEmail,
@@ -1222,8 +1258,9 @@ public abstract class IndivoModule
      *   <nevershare>false</nevershare>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/{document_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/{document_id}", 
             method = HttpMethod.PUT, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String appDocumentCreateOrUpdate(@RestUriParam("pha_email")String phaEmail,
@@ -1267,8 +1304,9 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/{document_id}/label", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/{document_id}/label", 
             method = HttpMethod.PUT, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String appDocumentLabel(@RestUriParam("pha_email")String phaEmail,
@@ -1311,8 +1349,9 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/external/{external_id}/meta", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/documents/external/{external_id}/meta", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})    
     public abstract String appDocumentMeta(@RestUriParam("pha_email") String phaEmail,
@@ -1349,8 +1388,9 @@ public abstract class IndivoModule
      *     }
      * }
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/manifest", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/manifest", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})      
     public abstract String appManifest(@RestUriParam("pha_email") String phaEmail) throws IOException;
@@ -1375,8 +1415,9 @@ public abstract class IndivoModule
      * 
      * </Records>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/records/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/records/", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})      
     public abstract String appRecordList(@RestUriParam("pha_email") String phaEmail) throws IOException;
@@ -1397,8 +1438,9 @@ public abstract class IndivoModule
      * oauth_token=abcd1fw3gasdgh3&oauth_token_secret=jgrlhre4291hfjas&xoauth_indivo_record_id=123
      *
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/records/{record_id}/access_token", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/apps/{pha_email}/records/{record_id}/access_token", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String autonomousAccessToken(@RestUriParam("record_id") String recordId,
@@ -1419,8 +1461,9 @@ public abstract class IndivoModule
      * 
      * <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}", 
             method = HttpMethod.DELETE,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetDelete(@RestUriParam("carenet_id") String carenetId) throws IOException;
@@ -1444,8 +1487,9 @@ public abstract class IndivoModule
      * 
      * </CarenetAccounts>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/accounts/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/accounts/", 
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetAccountList(@RestUriParam("carenet_id") String carenetId) throws IOException;
@@ -1464,8 +1508,9 @@ public abstract class IndivoModule
      * @return @return <ok/> if successful
      *
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/accounts/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/accounts/", 
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetAccountCreate(@RestUriParam("carenet_id") String carenetId,
@@ -1485,8 +1530,9 @@ public abstract class IndivoModule
      * @return @return <ok/> if successful
      *
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/accounts/{account_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/accounts/{account_id}", 
             method = HttpMethod.DELETE,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetAccountDelete(@RestUriParam("carenet_id") String carenetId,
@@ -1509,8 +1555,9 @@ public abstract class IndivoModule
      *   <DocumentType type="*" write="true" />
      * </Permissions>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/accounts/{account_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/accounts/{account_id}", 
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetAccountPermissions(@RestUriParam("carenet_id") String carenetId,
@@ -1553,8 +1600,9 @@ public abstract class IndivoModule
      * 
      * ]
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/apps", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/apps", 
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetAppsList(@RestUriParam("carenet_id") String carenetId) throws IOException;
@@ -1571,8 +1619,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/apps/{pha_email}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/apps/{pha_email}", 
             method = HttpMethod.DELETE,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetAppsDelete(@RestUriParam("carenet_id") String carenetId,
@@ -1590,8 +1639,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/apps/{pha_email}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/apps/{pha_email}", 
             method = HttpMethod.PUT,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetAppsCreate(@RestUriParam("carenet_id") String carenetId,
@@ -1725,8 +1775,9 @@ public abstract class IndivoModule
      *     ]
      * 
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/demographics", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/demographics", 
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetReadDemographics(@RestUriParam("carenet_id") String carenetId,
@@ -1773,8 +1824,9 @@ public abstract class IndivoModule
      * 
      * </Documents>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/documents/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/documents/", 
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetDocumentList(@RestUriParam("carenet_id") String carenetId,
@@ -1798,8 +1850,9 @@ public abstract class IndivoModule
      *   <otherField attr="val" />
      * </ExampleDocument>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/documents/{document_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/documents/{document_id}", 
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetDocument(@RestUriParam("carenet_id") String carenetId,
@@ -1842,8 +1895,9 @@ public abstract class IndivoModule
      * </Document>
      * 
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/documents/{document_id}/meta", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/documents/{document_id}/meta", 
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetDocumentMeta(@RestUriParam("carenet_id") String carenetId,
@@ -1867,8 +1921,9 @@ public abstract class IndivoModule
      * </Record>
      * 
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/record", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/record", 
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetRecord(@RestUriParam("carenet_id") String carenetId) throws IOException;
@@ -1890,8 +1945,9 @@ public abstract class IndivoModule
      *   <Carenet id="789" name="Work/School" mode="explicit" />
      * </Carenets>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/rename", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/carenets/{carenet_id}/rename", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetRename(@RestUriParam("carenet_id") String carenetId,
@@ -2534,8 +2590,9 @@ public abstract class IndivoModule
      *  {"abbreviation": null, "code": "55822004", "consumer_value": null,
      *   "umls_code": "C0020473", "full_value": "Hyperlipidemia (disorder)"}]
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/codes/systems/{system_short_name}/query", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/codes/systems/{system_short_name}/query", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String codingSystemQuery(@RestUriParam("system_short_name") String systemShortName,
@@ -2558,8 +2615,9 @@ public abstract class IndivoModule
      *   <demographics document_id="" />
      * </Record>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordCreate(String document) throws IOException;
@@ -2582,8 +2640,9 @@ public abstract class IndivoModule
      *   <demographics document_id="" />
      * </Record>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/external/{principal_email}/{external_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/external/{principal_email}/{external_id}",
             method = HttpMethod.PUT, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordCreateExt(@RestUriParam("principal_email") String principalEmail,
@@ -2611,8 +2670,9 @@ public abstract class IndivoModule
      * </Records>
      * 
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/search",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/search",
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordSearch(@RestQueryParam("label") String label) throws IOException;
@@ -2634,8 +2694,9 @@ public abstract class IndivoModule
      * </Record>
      * 
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}",
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String record(@RestUriParam("record_id") String recordId) throws IOException;
@@ -2679,8 +2740,9 @@ public abstract class IndivoModule
      * ]
      * 
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}",
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordPhas(@RestUriParam("record_id") String recordId,
@@ -2698,8 +2760,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}",
             method = HttpMethod.DELETE, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordPhaDelete(@RestUriParam("record_id") String recordId,
@@ -2738,8 +2801,9 @@ public abstract class IndivoModule
      *     }
      * }
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}",
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordPha(@RestUriParam("record_id") String recordId,
@@ -2757,8 +2821,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}",
             method = HttpMethod.PUT, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordPhaEnable(@RestUriParam("record_id") String recordId,
@@ -2809,8 +2874,9 @@ public abstract class IndivoModule
      * 
      * </Documents>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/",
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String  recordAppDocumentList(@RestUriParam("record_id") String recordId,
@@ -2858,8 +2924,9 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordAppDocumentCreate(@RestUriParam("record_id") String recordId,
@@ -2892,8 +2959,9 @@ public abstract class IndivoModule
      *   <nevershare>false</nevershare>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/external/{external_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/external/{external_id}",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordAppDocumentCreateOrUpdateExt(@RestUriParam("record_id") String recordId,
@@ -2938,8 +3006,9 @@ public abstract class IndivoModule
      *  </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/{document_id}/meta",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/{document_id}/meta",
             method = HttpMethod.GET, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordAppDocumentMeta(@RestUriParam("record_id") String recordId,
@@ -2976,8 +3045,9 @@ public abstract class IndivoModule
      *   <nevershare>false</nevershare>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/external/{external_id}/meta",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/external/{external_id}/meta",
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordAppDocumentMetaExt(@RestUriParam("record_id") String recordId,
@@ -2997,8 +3067,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/{document_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/{document_id}",
             method = HttpMethod.DELETE,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordAppDocumentDelete(@RestUriParam("record_id") String recordId,
@@ -3024,8 +3095,9 @@ public abstract class IndivoModule
      *   <Preference name="show_rels" value="false" />
      * </ProblemsPreferences>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/{document_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/{document_id}",
             method = HttpMethod.DELETE,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordAppSpecificDocument(@RestUriParam("record_id") String recordId,
@@ -3070,8 +3142,9 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/{document_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/documents/{document_id}",
             method = HttpMethod.PUT,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordAppDocumentLabel(@RestUriParam("record_id") String recordId,
@@ -3096,8 +3169,9 @@ public abstract class IndivoModule
      * 
      * oauth_token=abcd1fw3gasdgh3&oauth_token_secret=jgrlhre4291hfjas&xoauth_indivo_record_id=123
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/setup",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/apps/{pha_id}/setup",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordPhaSetup(@RestUriParam("record_id") String recordId,
@@ -3144,8 +3218,9 @@ public abstract class IndivoModule
      * 
      * </Reports>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/audits/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/audits/",
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String auditRecordView(@RestUriParam("record_id") String recordId,
@@ -3195,8 +3270,9 @@ public abstract class IndivoModule
      * 
      * </Reports>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/audits/documents/{document_id}/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/audits/documents/{document_id}/",
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String auditDocumentView(@RestUriParam("record_id") String recordId,
@@ -3249,8 +3325,9 @@ public abstract class IndivoModule
      * 
      * </Reports>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/audits/documents/{document_id}/functions/{function_name}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/audits/documents/{document_id}/functions/{function_name}",
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String auditFunctionView(@RestUriParam("record_id") String recordId,
@@ -3385,8 +3462,9 @@ public abstract class IndivoModule
      * 
      * </Carenets>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/autoshare/bytype/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/autoshare/bytype/",
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String autoshareList(@RestUriParam("record_id") String recordId,
@@ -3417,8 +3495,9 @@ public abstract class IndivoModule
      * 
      * </DocumentSchemas>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/autoshare/bytype/all",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/autoshare/bytype/all",
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String autoshareListByTypeAll(@RestUriParam("record_id") String recordId) throws IOException;    
@@ -3436,8 +3515,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/autoshare/carenets/{carenet_id}/bytype/set",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/autoshare/carenets/{carenet_id}/bytype/set",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String autoshareCreate(@RestUriParam("record_id") String recordId,
@@ -3457,8 +3537,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/autoshare/carenets/{carenet_id}/bytype/unset",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/autoshare/carenets/{carenet_id}/bytype/unset",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String autoshareDelete(@RestUriParam("record_id") String recordId,
@@ -3485,8 +3566,9 @@ public abstract class IndivoModule
      * 
      * </Carenets>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/carenets/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/carenets/",
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetList(@RestUriParam("record_id") String recordId) throws IOException;    
@@ -3509,8 +3591,9 @@ public abstract class IndivoModule
      *   <Carenet id="789" name="Work/School" mode="explicit" />
      * </Carenets>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/carenets/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/carenets/",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetCreate(@RestUriParam("record_id") String recordId,
@@ -3644,8 +3727,9 @@ public abstract class IndivoModule
      *         }
      *     ]
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/demographics",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/demographics",
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String readDemographics(@RestUriParam("record_id") String recordId,
@@ -3675,8 +3759,9 @@ public abstract class IndivoModule
      *   <nevershare>false</nevershare>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/demographics",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/demographics",
             method = HttpMethod.PUT, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String setDemographics(@RestUriParam("record_id") String recordId) throws IOException;    
@@ -3692,8 +3777,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/",
             method = HttpMethod.DELETE, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentsDelete(@RestUriParam("record_id") String recordId) throws IOException;    
@@ -3743,8 +3829,9 @@ public abstract class IndivoModule
      * 
      * </Documents>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/",
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordDocumentList(@RestUriParam("record_id") String recordId,
@@ -3790,8 +3877,9 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentCreate(@RestUriParam("record_id") String recordId,
@@ -3836,8 +3924,9 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/external/{pha_id}/{external_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/external/{pha_id}/{external_id}",
             method = HttpMethod.PUT, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentCreateByExtId(@RestUriParam("record_id") String recordId,
@@ -3884,8 +3973,9 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/external/{pha_id}/{external_id}/label",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/external/{pha_id}/{external_id}/label",
             method = HttpMethod.PUT, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordDocumentLabelExt(@RestUriParam("record_id") String recordId,
@@ -3931,8 +4021,9 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/external/{pha_id}/{external_id}/meta",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/external/{pha_id}/{external_id}/meta",
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordDocumentMetaExt(@RestUriParam("record_id") String recordId,
@@ -3953,8 +4044,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{object_rel_document_id}/rels/{rel}/{subject_rel_document_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{object_rel_document_id}/rels/{rel}/{subject_rel_document_id}",
             method = HttpMethod.PUT,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentRels(@RestUriParam("record_id") String recordId,
@@ -3977,8 +4069,9 @@ public abstract class IndivoModule
      * Example Return Value:
      * <HBA1C xmlns="http://indivo.org/vocab#" value="5.3" unit="percent" datetime="2011-01-15T17:00:00.000Z" />
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}",
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordSpecificDocument(@RestUriParam("record_id") String recordId,
@@ -4004,8 +4097,9 @@ public abstract class IndivoModule
      * 
      * </Carenets>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/carenets",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/carenets",
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentCarenets(@RestUriParam("record_id") String recordId,
@@ -4024,8 +4118,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/carenets/{carenet_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/carenets/{carenet_id}",
             method = HttpMethod.DELETE,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetDocumentDelete(@RestUriParam("record_id") String recordId,
@@ -4045,8 +4140,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/carenets/{carenet_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/carenets/{carenet_id}",
             method = HttpMethod.PUT,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String carenetDocumentPlacement(@RestUriParam("record_id") String recordId,
@@ -4066,8 +4162,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/carenets/{carenet_id}/autoshare-revert",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/carenets/{carenet_id}/autoshare-revert",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String autoshareRevert(@RestUriParam("record_id") String recordId,
@@ -4111,8 +4208,9 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/label",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/label",
             method = HttpMethod.PUT,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordDocumentLabel(@RestUriParam("record_id") String recordId,
@@ -4155,8 +4253,9 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/meta",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/meta",
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordDocumentMeta(@RestUriParam("record_id") String recordId,
@@ -4174,8 +4273,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/meta",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/meta",
             method = HttpMethod.PUT,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String updateDocumentMeta(@RestUriParam("record_id") String recordId,
@@ -4193,8 +4293,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/nevershare",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/nevershare",
             method = HttpMethod.DELETE,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentRemoveNevershare(@RestUriParam("record_id") String recordId,
@@ -4212,8 +4313,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/nevershare",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/nevershare",
             method = HttpMethod.PUT,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentSetNevershare(@RestUriParam("record_id") String recordId,
@@ -4266,8 +4368,9 @@ public abstract class IndivoModule
      * 
      * </Documents>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/audits/documents/{document_id}/rels/{rel}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/audits/documents/{document_id}/rels/{rel}",
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String getDocumentsByRel(@RestUriParam("record_id") String recordId,
@@ -4306,8 +4409,9 @@ public abstract class IndivoModule
      *     </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/rels/{rel}/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/rels/{rel}/",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentCreateByRel(@RestUriParam("record_id") String recordId,
@@ -4345,8 +4449,9 @@ public abstract class IndivoModule
      *     </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/rels/{rel}/external/{pha_id}/{external_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/rels/{rel}/external/{pha_id}/{external_id}",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentCreateByRelWithExtId(@RestUriParam("record_id") String recordId,
@@ -4394,8 +4499,9 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/replace",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/replace",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentVersion(@RestUriParam("record_id") String recordId,
@@ -4442,8 +4548,9 @@ public abstract class IndivoModule
      *   </isRelatedFrom>
      * </Document>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/replace/external/{pha_id}/{external_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/replace/external/{pha_id}/{external_id}",
             method = HttpMethod.PUT,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentVersionByExtId(@RestUriParam("record_id") String recordId,
@@ -4466,8 +4573,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/set-status",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/set-status",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentSetStatus(@RestUriParam("record_id") String recordId,
@@ -4497,8 +4605,9 @@ public abstract class IndivoModule
      * 
      * </DocumentStatusHistory>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/status-history",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/status-history",
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentStatusHistory(@RestUriParam("record_id") String recordId,
@@ -4549,8 +4658,9 @@ public abstract class IndivoModule
      * 
      * </Documents>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/versions/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/documents/{document_id}/versions/",
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String documentVersions(@RestUriParam("record_id") String recordId,
@@ -4577,8 +4687,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/inbox/{message_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/inbox/{message_id}", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordSendMessage(@RestUriParam("record_id") String recordId,
@@ -4603,8 +4714,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/inbox/{message_id}/attachments/{attachment_num}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/inbox/{message_id}/attachments/{attachment_num}", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordMessageAttach(@RestUriParam("record_id") String recordId,
@@ -4626,8 +4738,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/notifications/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/notifications/", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordNotify(@RestUriParam("record_id") String recordId,
@@ -4649,8 +4762,9 @@ public abstract class IndivoModule
      * Example Return Value:
      * <Account id='joeuser@example.com' />
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/owner", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/owner", 
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordGetOwner(@RestUriParam("record_id") String recordId) throws IOException;
@@ -4681,8 +4795,9 @@ public abstract class IndivoModule
      *   <authSystem name="hospital_sso" username="Joe_User" />
      * </Account>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/owner", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/owner", 
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordSetOwner(@RestUriParam("record_id") String recordId,
@@ -4809,8 +4924,9 @@ public abstract class IndivoModule
      *   </Actors>
      * </ContinuityOfCareRecord>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/reports/experimental/ccr", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/reports/experimental/ccr", 
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String reportCcr(@RestUriParam("record_id") String recordId) throws IOException;
@@ -5454,8 +5570,9 @@ public abstract class IndivoModule
      * 
      * </Shares>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/shares/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/shares/",
             method = HttpMethod.GET,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordShares(@RestUriParam("record_id") String recordId) throws IOException;        
@@ -5473,8 +5590,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful.
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/shares/",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/shares/",
             method = HttpMethod.POST, contentType="application/x-www-form-urlencoded",
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordShareAdd(@RestUriParam("record_id") String recordId,
@@ -5493,8 +5611,9 @@ public abstract class IndivoModule
      * 
      * @return <ok/> if successful.
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/shares/{other_account_id}",
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/shares/{other_account_id}",
             method = HttpMethod.DELETE,
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String recordShareDelete(@RestUriParam("record_id") String recordId,
@@ -5530,8 +5649,9 @@ public abstract class IndivoModule
      *     }
      * }
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/capabilities/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/capabilities/", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String smartCapabilities() throws IOException;
@@ -5547,8 +5667,9 @@ public abstract class IndivoModule
      * @return An OWL file describing the SMART ontology.
      * Example Return Value - see http://sandbox-api.smartplatforms.org/ontology
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/ontology", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/ontology", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String smartOntology() throws IOException;
@@ -5687,8 +5808,9 @@ public abstract class IndivoModule
      *   </rdf:Description>
      * </rdf:RDF>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/allergies/", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/allergies/", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String smartAllergies(@RestUriParam("record_id") String recordId) throws IOException;
@@ -5769,8 +5891,9 @@ public abstract class IndivoModule
      *     </rdf:Description>
      * </rdf:RDF>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/allergies/{model_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/allergies/{model_id}", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String smartAllergiesInstance(@RestUriParam("record_id") String recordId,
@@ -5933,8 +6056,9 @@ public abstract class IndivoModule
      *   </rdf:Description>
      * </rdf:RDF>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/{model_name}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/{model_name}", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String smartGeneric(@RestUriParam("record_id") String recordId,
@@ -6084,8 +6208,9 @@ public abstract class IndivoModule
      *     </rdf:Description>
      * </rdf:RDF>
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/{model_name}/{model_id}", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/records/{record_id}/{model_name}/{model_id}", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String smartGenericInstance(@RestUriParam("record_id") String recordId,
@@ -6105,8 +6230,9 @@ public abstract class IndivoModule
      * Example Return Value:
      * 1.0.0.0
      */
-    @Processor
-    @RestCall(uri = "{protocol}://{server}:{port}/version", 
+    @OAuthProtected
+@Processor
+@RestCall(uri = "{protocol}://{server}:{port}/version", 
             method = HttpMethod.GET, 
             exceptions={@RestExceptionOn(expression="#[message.inboundProperties['http.status'] != 200]")})
     public abstract String getVersion() throws IOException;

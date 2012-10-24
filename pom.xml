@@ -189,7 +189,7 @@
         <dependency>
             <artifactId>mule-transport-http</artifactId>
             <groupId>org.mule.transports</groupId>
-            <version>${mule.version}</version>
+            <version>3.3.0</version>
             <scope>compile</scope>
         </dependency> 
         <dependency>

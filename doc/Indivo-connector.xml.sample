@@ -127,7 +127,7 @@
 <!-- END_INCLUDE(indivo:app-document-list) -->
 
 <!-- BEGIN_INCLUDE(indivo:app-document-create) -->
-    <indivo:app-document-create phaEmail="myApp@mulesoft.com" document-ref="#[payload]"/>
+    <indivo:app-document-create phaEmail="myApp@mulesoft.com" document="#[payload]"/>
 <!-- END_INCLUDE(indivo:app-document-create) -->
 
 <!-- BEGIN_INCLUDE(indivo:app-document-create-or-update-ext) -->
